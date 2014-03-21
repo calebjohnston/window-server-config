@@ -14,7 +14,6 @@
 	class DisplayDevice;
 #endif
 
-#include <set>
 #include <vector>
 
 #include "DisplayQuery.h"

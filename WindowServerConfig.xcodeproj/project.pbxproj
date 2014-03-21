@@ -16,7 +16,7 @@
 		3C72377B18DBC8F700ED73D9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377A18DBC8F700ED73D9 /* Foundation.framework */; };
 		3C72377E18DBCDC700ED73D9 /* DisplayQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */; };
 		3C72378118DBCF9100ED73D9 /* DisplayDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378018DBCF9100ED73D9 /* DisplayDevice.m */; };
-		3C72378418DBF1F200ED73D9 /* DisplayConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378218DBF1F200ED73D9 /* DisplayConfiguration.mm */; };
+		3C72378418DBF1F200ED73D9 /* DisplayLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,8 +45,8 @@
 		3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayQuery.mm; sourceTree = "<group>"; };
 		3C72377F18DBCF9100ED73D9 /* DisplayDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayDevice.h; sourceTree = "<group>"; };
 		3C72378018DBCF9100ED73D9 /* DisplayDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayDevice.m; sourceTree = "<group>"; };
-		3C72378218DBF1F200ED73D9 /* DisplayConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayConfiguration.mm; sourceTree = "<group>"; };
-		3C72378318DBF1F200ED73D9 /* DisplayConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayConfiguration.h; sourceTree = "<group>"; };
+		3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayLayout.mm; sourceTree = "<group>"; };
+		3C72378318DBF1F200ED73D9 /* DisplayLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayLayout.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,8 +91,8 @@
 				3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */,
 				3C72377F18DBCF9100ED73D9 /* DisplayDevice.h */,
 				3C72378018DBCF9100ED73D9 /* DisplayDevice.m */,
-				3C72378318DBF1F200ED73D9 /* DisplayConfiguration.h */,
-				3C72378218DBF1F200ED73D9 /* DisplayConfiguration.mm */,
+				3C72378318DBF1F200ED73D9 /* DisplayLayout.h */,
+				3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */,
 			);
 			path = WindowServerConfig;
 			sourceTree = "<group>";
@@ -163,7 +163,7 @@
 				3C72378118DBCF9100ED73D9 /* DisplayDevice.m in Sources */,
 				3C72376918DBC80000ED73D9 /* main.cpp in Sources */,
 				3C72377E18DBCDC700ED73D9 /* DisplayQuery.mm in Sources */,
-				3C72378418DBF1F200ED73D9 /* DisplayConfiguration.mm in Sources */,
+				3C72378418DBF1F200ED73D9 /* DisplayLayout.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +295,7 @@
 				3C72377018DBC80000ED73D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

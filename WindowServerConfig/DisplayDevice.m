@@ -6,6 +6,11 @@
 //  Copyright (c) 2014 Caleb Johnston. All rights reserved.
 //
 
+#import <IOKit/IOKitLib.h>
+#import <IOKit/graphics/IOGraphicsLib.h>
+#import <IOKit/graphics/IOGraphicsTypes.h>
+#import <IOKit/graphics/IOGraphicsInterface.h>
+
 #import "DisplayDevice.h"
 
 @implementation DisplayMode : NSObject
@@ -53,18 +58,17 @@
 
 - (NSString*) toNSString
 {
-	NSString* fmt = @"Display Mode\n\t %@ %li\n\t %@ %.1f\n\t %@ %i\n\t %@ %i\n\t %@ (%i x %i)\n\t %@ %@\n";
+	NSString* fmt = @"    - Display Mode\n\t %@ %li\n\t %@ %.1f\n\t %@ %i\n\t %@ %i\n\t %@ (%i x %i)\n\t %@ %@\n";
 	NSString* output = [NSString stringWithFormat:fmt,
 						@"Device type:\t", self.type,
 						@"Refresh Rate:\t", self.refreshRate,
-						@"IO Flags:\t\t", self.ioFlags,
-						@"IO ModeID:\t\t", self.ioModeId,
+						@"IO Flags:\t", self.ioFlags,
+						@"IO ModeID:\t", self.ioModeId,
 						@"Display Size:\t", (uint32_t)self.width, (uint32_t)self.height,
 						@"Desktop GUI:\t", (self.usableForDesktopGui ? @"True" : @"False")];
 	
 	return output;
 }
-
 - (void) dealloc
 {
 	[super dealloc];
@@ -120,9 +124,10 @@
 
 - (NSString*) toNSString
 {
-	NSString* fmt = @"%@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ (%.0fmm x %.0fmm)\n\t %@ %.2f\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ [%.0f,%.0f %.0fx%.0f]\n";
+	NSString* fmt = @"%@ - %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ (%.0fmm x %.0fmm)\n\t %@ %.1f\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ [%.0f,%.0f %.0fx%.0f]\n";
+	NSString* displayName = [self displayNameFromDisplayId:deviceId];
 	NSString* output = [NSString stringWithFormat:fmt,
-						@"Device ID:", deviceId,
+						displayName, deviceId,
 						@"Model Number:\t", self.modelNumber,
 						@"Serial Number:\t", self.serialNumber,
 						@"Unit Number:\t", self.unitNumber,
@@ -138,6 +143,24 @@
 	output = [output stringByAppendingString:[displayMode toNSString]];
 	
 	return output;
+}
+
+- (NSString*) displayNameFromDisplayId:(CGDirectDisplayID) display
+{
+	NSString *displayProductName = nil;
+
+	// Get a CFDictionary with a key for the preferred name of the display.
+	NSDictionary *displayInfo = (NSDictionary *)IODisplayCreateInfoDictionary(CGDisplayIOServicePort(display), kIODisplayOnlyPreferredName);
+	// Retrieve the display product name.
+	NSDictionary *localizedNames = [displayInfo objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+
+	// Use the first name.
+	if ([localizedNames count] > 0) {
+		displayProductName = [[localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]] retain];
+	}
+
+	[displayInfo release];
+	return [displayProductName autorelease];
 }
 
 @end

@@ -31,9 +31,7 @@
 	CGDirectDisplayID deviceId;
 	DisplayMode* displayMode;
 	
-//	CGDirectDisplayID CGDisplayMirrorsDisplay;
 //	CGError CGDisplayMoveCursorToPoint;	// cool!
-	
 }
 
 @property (nonatomic) CGRect displayBoundary;
@@ -61,5 +59,6 @@
 - (CGDirectDisplayID) getDeviceId;
 - (CGDisplayModeRef) getMode;
 - (NSString*) toNSString;
+- (NSString*) displayNameFromDisplayId:(CGDirectDisplayID) display;
 
 @end

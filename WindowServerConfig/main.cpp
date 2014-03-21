@@ -17,37 +17,31 @@
 #include <iostream>
 
 #include "DisplayQuery.h"
-#include "DisplayConfiguration.h"
+#include "DisplayLayout.h"
 
 namespace po = boost::program_options;
 
 int main(int argc, const char * argv[])
 {
-//	float dt = 0.1;
-//	std::vector<int> grid_dims(3, 50);	// grid dimensions
-//	
-//	float gvec[3] = {0.0, 0.0, -1.0}; // gravitational field (constant)
-//	
-//	float cg_tol = pow( DBL_EPSILON, 0.5 );
-//	unsigned cg_maxiter = 200;
-//	std::string output_prefix = "density_export_";
-//	int window_width = 1280;
-//	int window_height = 1024;
+	
+//	float gvec[3] = {0.0, 0.0, -1.0};
+//	std::string output_prefix = "export_";
+	int desired_width;
+	int desired_height;
+	double refresh_rate;
+	std::vector<int> resolution;
+	std::string rotation;
 	
 	try {
 		po::options_description desc("Allowed options");
 		desc.add_options()
 		("help,H", "produce help message")
-		("query,Q", "query displays");
-//		("output-format,O", po::value<std::string>(), "output format")
-//		("output-name,N", po::value<std::string>(&output_prefix), "output file name PREFIX")
-//		("grid,G", po::value< std::vector<int> >(&grid_dims)->multitoken(), "[ X Y Z ]")
-//		("gravity,Z", po::value<float>(&gvec[2]), "z gravity component ")
-//		("solver-tol,R", po::value<float>(&cg_tol), "linear solver convergence tolerance")
-//		("timestep,T", po::value<float>(&dt), "timestep update")
-//		("solver-iterations,I", po::value<unsigned>(&cg_maxiter)->default_value(200), "maximum solver iterations")
-//		("win-width,W", po::value<int>(&window_width)->default_value(512), "Glut window width")
-//		("win-height,E", po::value<int>(&window_height)->default_value(512), "Glut window height");
+		("query,Q", "query displays")
+		("rotation,O", po::value<std::string>(&rotation), "desired rotation in degrees 0,90,180, or 270")
+		("resolution,R", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
+		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
+		("width,W", po::value<int>(&desired_width)->default_value(1), "display arrangement width (in displays)")
+		("height,H", po::value<int>(&desired_height)->default_value(1), "display arrangement height (in displays)");
 		
 		po::variables_map vm;
 		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::default_style
@@ -82,8 +76,7 @@ int main(int argc, const char * argv[])
 	catch(...) {
 	}
 	
-	DisplayConfiguration* dc = new DisplayConfiguration();
-	delete dc;
+	DisplayLayout dl;
 	
     return 0;
 }

@@ -10,6 +10,7 @@
 	#import <ApplicationServices/ApplicationServices.h>
 	#import <Foundation/Foundation.h>
 	#import <CoreGraphics/CoreGraphics.h>
+	#import <IOKit/IOKitLib.h>
 	#import "DisplayDevice.h"
 #endif
 
@@ -34,6 +35,16 @@ DisplayQuery::DisplayQuery()
 
 DisplayQuery::~DisplayQuery()
 {
+	
+	
+	
+//	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes([mQuery->displays().front() getDeviceId], NULL);
+//	CFIndex index, count = CFArrayGetCount(displayModes);
+//	for (index = 0; index < count; index++) {
+//		CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, index);
+//		DisplayMode* dmode = [[DisplayMode alloc] initWithDisplayMode:mode];
+//		std::cout << [[dmode toNSString] UTF8String] << std::endl;
+//	}
 	
 }
 
