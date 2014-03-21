@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>EFE633DB-4747-48B3-8CE0-6BE7C7E93F47</string>
+	<key>IDESourceControlProjectName</key>
+	<string>WindowServerConfig</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>19CFB676-3D32-496C-8C08-0C8D024C102B</key>
+		<string>ssh://github.com/calebjohnston/window-server-config.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>WindowServerConfig.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>19CFB676-3D32-496C-8C08-0C8D024C102B</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/calebjohnston/window-server-config.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>19CFB676-3D32-496C-8C08-0C8D024C102B</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>19CFB676-3D32-496C-8C08-0C8D024C102B</string>
+			<key>IDESourceControlWCCName</key>
+			<string>WindowServerConfig</string>
+		</dict>
+	</array>
+</dict>
+</plist>

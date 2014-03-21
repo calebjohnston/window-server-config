@@ -101,7 +101,7 @@
 
 - (NSString*) toUTF8String
 {
-	NSString* fmt = @"%@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ (%.0f x %.0f)\n\t %@ %.2f\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ [%.0f,%.0f %.0fx%.0f]\n";
+	NSString* fmt = @"%@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ (%.0fmm x %.0fmm)\n\t %@ %.2f\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ [%.0f,%.0f %.0fx%.0f]\n";
 	NSString* output = [NSString stringWithFormat:fmt,
 						@"Device ID:", deviceId,
 						@"Model Number:\t", self.modelNumber,
