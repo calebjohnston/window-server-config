@@ -10,6 +10,26 @@
 
 @implementation DisplayMode : NSObject
 
+- (id) initWithDisplayMode:(CGDisplayModeRef) mode
+{
+	self = [super init];
+	if (self) {
+		self.modeRef = mode;
+		CGDisplayModeRetain(self.modeRef);
+		
+		self.type = CGDisplayModeGetTypeID();
+		self.refreshRate = CGDisplayModeGetRefreshRate(self.modeRef);
+		self.ioFlags = CGDisplayModeGetIOFlags(self.modeRef);
+		self.ioModeId = CGDisplayModeGetIODisplayModeID(self.modeRef);
+		self.height = CGDisplayModeGetHeight(self.modeRef);
+		self.width = CGDisplayModeGetWidth(self.modeRef);
+		self.copyPixelEncoding = CGDisplayModeCopyPixelEncoding(self.modeRef);
+		self.usableForDesktopGui = CGDisplayModeIsUsableForDesktopGUI(self.modeRef);
+	}
+	
+	return self;
+}
+
 - (id) initWithDisplay:(CGDirectDisplayID) display
 {
 	self = [super init];
@@ -18,30 +38,29 @@
 		self.modeRef = CGDisplayCopyDisplayMode(display);
 		CGDisplayModeRetain(self.modeRef);
 		
-		//if (kCGErrorSuccess == err) {
-			self.type = CGDisplayModeGetTypeID();
-			self.refreshRate = CGDisplayModeGetRefreshRate(self.modeRef);
-			self.ioFlags = CGDisplayModeGetIOFlags(self.modeRef);
-			self.ioModeId = CGDisplayModeGetIODisplayModeID(self.modeRef);
-			self.height = CGDisplayModeGetHeight(self.modeRef);
-			self.width = CGDisplayModeGetWidth(self.modeRef);
-			self.copyPixelEncoding = CGDisplayModeCopyPixelEncoding(self.modeRef);
-			self.usableForDesktopGui = CGDisplayModeIsUsableForDesktopGUI(self.modeRef);
-//		}
-//		else {
-//			NSLog(@"Error creating DisplayMode: %i", err);
-//		}
+		self.type = CGDisplayModeGetTypeID();
+		self.refreshRate = CGDisplayModeGetRefreshRate(self.modeRef);
+		self.ioFlags = CGDisplayModeGetIOFlags(self.modeRef);
+		self.ioModeId = CGDisplayModeGetIODisplayModeID(self.modeRef);
+		self.height = CGDisplayModeGetHeight(self.modeRef);
+		self.width = CGDisplayModeGetWidth(self.modeRef);
+		self.copyPixelEncoding = CGDisplayModeCopyPixelEncoding(self.modeRef);
+		self.usableForDesktopGui = CGDisplayModeIsUsableForDesktopGUI(self.modeRef);
     }
 	
 	return self;
 }
 
-- (NSString*) toUTF8String
+- (NSString*) toNSString
 {
-	const char str[] = "hello";
-	NSString* output = [NSString stringWithUTF8String:str];
-	
-	// append info...
+	NSString* fmt = @"Display Mode\n\t %@ %li\n\t %@ %.1f\n\t %@ %i\n\t %@ %i\n\t %@ (%i x %i)\n\t %@ %@\n";
+	NSString* output = [NSString stringWithFormat:fmt,
+						@"Device type:\t", self.type,
+						@"Refresh Rate:\t", self.refreshRate,
+						@"IO Flags:\t\t", self.ioFlags,
+						@"IO ModeID:\t\t", self.ioModeId,
+						@"Display Size:\t", (uint32_t)self.width, (uint32_t)self.height,
+						@"Desktop GUI:\t", (self.usableForDesktopGui ? @"True" : @"False")];
 	
 	return output;
 }
@@ -99,7 +118,7 @@
 	return displayMode.modeRef;
 }
 
-- (NSString*) toUTF8String
+- (NSString*) toNSString
 {
 	NSString* fmt = @"%@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ %i\n\t %@ (%.0fmm x %.0fmm)\n\t %@ %.2f\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ %@\n\t %@ [%.0f,%.0f %.0fx%.0f]\n";
 	NSString* output = [NSString stringWithFormat:fmt,
@@ -116,6 +135,7 @@
 						@"Is Primary:\t", (self.isMain ? @"True" : @"False"),
 						@"HW Accelerated:", (self.usesOpenGLAcceleration ? @"True" : @"False"),
 						@"Bounds:\t", self.displayBoundary.origin.x, self.displayBoundary.origin.y, self.displayBoundary.size.width, self.displayBoundary.size.height ];
+	output = [output stringByAppendingString:[displayMode toNSString]];
 	
 	return output;
 }

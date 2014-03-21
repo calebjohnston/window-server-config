@@ -20,8 +20,9 @@
 @property (nonatomic) CFStringRef copyPixelEncoding;
 @property (nonatomic) BOOL usableForDesktopGui;
 
+- (id) initWithDisplayMode:(CGDisplayModeRef) mode;
 - (id) initWithDisplay:(CGDirectDisplayID) display;
-- (NSString*) toUTF8String;
+- (NSString*) toNSString;
 
 @end
 
@@ -59,6 +60,6 @@
 - (id) initWithDisplay:(CGDirectDisplayID) display;
 - (CGDirectDisplayID) getDeviceId;
 - (CGDisplayModeRef) getMode;
-- (NSString*) toUTF8String;
+- (NSString*) toNSString;
 
 @end

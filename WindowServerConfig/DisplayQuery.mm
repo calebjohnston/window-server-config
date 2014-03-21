@@ -42,7 +42,7 @@ std::string DisplayQuery::toString()
 	NSString* output = [[NSString alloc] init];
 	
 	for (DisplayDevice* device : mDisplays) {
-		NSString* dspl = [device toUTF8String];
+		NSString* dspl = [device toNSString];
 		output = [output stringByAppendingString:dspl];
 		output = [output stringByAppendingString:@"\n"];
 	}
