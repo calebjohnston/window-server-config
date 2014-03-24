@@ -15,17 +15,15 @@
 
 #include "DisplayLayout.h"
 
-DisplayLayout::DisplayLayout() : mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0)
+DisplayLayout::DisplayLayout()
+ :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mPersistence(PERMANENT)
 {
 }
 
 DisplayLayout::~DisplayLayout()
 {
 	if (nullptr != mConfigRef) {
-		CGError result = CGCancelDisplayConfiguration(mConfigRef);
-		//if (kCGErrorSuccess != err) {
-		//	std::cout << "Configuration error : " << err << std::endl;
-		//}
+		CGCancelDisplayConfiguration(mConfigRef);
 	}
 }
 
@@ -136,9 +134,7 @@ bool DisplayLayout::applyLayoutChanges()
 			break;
 	}
 	result = CGCompleteDisplayConfiguration(mConfigRef, option);
-	
 	bool success = (kCGErrorSuccess == result);
-	
 	if (success) {
 		// rotate 90 degrees...
 		// CGDirectDisplayID display = CGMainDisplayID();
@@ -156,12 +152,12 @@ bool DisplayLayout::applyLayoutChanges()
 		IOFramebufferInformation info;
 		kern_return_t IOFBGetFramebufferInformationForAperture( connect, aperture, &info );
 		 */
+		
+		mConfigRef = nullptr;
 	}
-	
-	if (!success) {
+	else {
 		std::cerr << "Configure Completion error : " << result << std::endl;
 	}
-	
 	
 	return success;
 }

@@ -23,9 +23,6 @@ namespace po = boost::program_options;
 
 int main(int argc, const char * argv[])
 {
-	
-//	float gvec[3] = {0.0, 0.0, -1.0};
-//	std::string output_prefix = "export_";
 	int desired_cols;
 	int desired_rows;
 	double refresh_rate;
