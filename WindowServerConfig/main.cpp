@@ -30,8 +30,8 @@ int main(int argc, const char * argv[])
 	int desired_height;
 	double refresh_rate;
 	int device_id;
-	std::vector<int> resolution;
-	std::string rotation;
+	std::vector<int32_t> resolution;
+	std::string rotation_str;
 	
 	try {
 		po::options_description desc("Allowed options");
@@ -39,7 +39,7 @@ int main(int argc, const char * argv[])
 		("help,H", "produce help message")
 		("query,Q", "get all connected displays")
 		("modes,M", po::value<int>(&device_id), "query device modes for device id")
-		("rotation,O", po::value<std::string>(&rotation), "desired rotation in degrees 0, 90, 180, or 270")
+		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees: 0, 90, 180, or 270")
 		("resolution,R", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
 		("width,W", po::value<int>(&desired_width)->default_value(1), "display arrangement width (in displays)")
@@ -92,6 +92,29 @@ int main(int argc, const char * argv[])
 			
 			return 0;
 		}
+		
+		if (var_map.count("rotation") || var_map.count("resolution") ||
+			var_map.count("refresh") || var_map.count("width") || var_map.count("height"))
+		{
+			DisplayLayout dl;
+			dl.setDesiredHeight(desired_height);
+			dl.setDesiredWidth(desired_width);
+			DisplayLayout::Orientation rotation;
+			if ("90" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_90;
+			}
+			else if ("180" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_180;
+			}
+			else if ("270" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_270;
+			}
+			else {
+				rotation = DisplayLayout::NORMAL;
+			}
+			dl.setDesiredOrientation(rotation);
+			dl.setDesiredResolution(resolution[0], resolution[1]);
+		}
 	
 		std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
 		std::cout << desc << std::endl;
@@ -102,8 +125,6 @@ int main(int argc, const char * argv[])
 	catch(...) {
 		return 2;
 	}
-	
-	//DisplayLayout dl;
 	
     return 0;
 }
