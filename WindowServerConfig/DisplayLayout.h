@@ -32,6 +32,12 @@ public:
 		LOWER_RIGHT
 	} Corner;
 	
+	typedef enum persistence_t {
+		APPLICATION = 0,
+		SESSION = 1,
+		PERMANENT = 2
+	} Persistence;
+	
 public:
 	DisplayLayout();
 	~DisplayLayout();
@@ -52,6 +58,9 @@ public:
 	void setPrimaryDisplay(const Corner display) { mPrimary = display; }
 	Corner primaryDisplay() const { return mPrimary; }
 	
+	void setPersistence(const Persistence setting) { mPersistence = setting; }
+	Persistence persistence() const { return mPersistence; }
+	
 	bool applyLayoutChanges();
 	
 private:
@@ -59,6 +68,7 @@ private:
 	uint32_t mResHeight;
 	uint8_t mColumns;
 	uint8_t mRows;
+	Persistence mPersistence;
 	Orientation mOrientation;
 	Corner mPrimary;
 	

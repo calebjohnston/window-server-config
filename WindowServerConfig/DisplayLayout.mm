@@ -81,17 +81,12 @@ bool DisplayLayout::applyLayoutChanges()
 				}
 			}
 			
+			// maybe should not do this ...
 			if (!isResolutionSupported) {
-				std::cerr << "Desired resolution (" << mResWidth << "x" << mResHeight << ") not supported." << std::endl;
-				return false;
+				std::cerr << "Desired resolution (" << mResWidth << "x" << mResHeight << ") not supported on all displays. Attempting best fit..." << std::endl;
 			}
 		}
 	}
-	
-	// this does not work...
-	//err = CGConfigureDisplayWithDisplayMode(mConfigRef, [mQuery->displays().back() getDeviceId], [mQuery->displays().front() getMode], NULL);
-	// this works...
-	//err = CGConfigureDisplayOrigin(mConfigRef, 69678080, 1920, 0);
 	
 	// reposition all displays
 	CGError result;
@@ -110,10 +105,9 @@ bool DisplayLayout::applyLayoutChanges()
 		}
 	}
 	
+	/*
 	switch (mPrimary) {
 		case UPPER_LEFT:
-//			mQuery->displays().at(index)
-			
 			break;
 			
 		case UPPER_RIGHT:
@@ -124,19 +118,44 @@ bool DisplayLayout::applyLayoutChanges()
 			
 		case LOWER_RIGHT:
 			break;
-	}
+	}*/
 	
-	result = CGCompleteDisplayConfiguration(mConfigRef, kCGConfigureForSession);
+	// assign the proper setting context...
+	CGConfigureOption option;
+	switch (mPersistence) {
+		case APPLICATION:
+			option = kCGConfigureForAppOnly;
+			break;
+			
+		case SESSION:
+			option = kCGConfigureForSession;
+			break;
+			
+		case PERMANENT:
+			option = kCGConfigurePermanently;
+			break;
+	}
+	result = CGCompleteDisplayConfiguration(mConfigRef, option);
 	
 	bool success = (kCGErrorSuccess == result);
 	
 	if (success) {
 		// rotate 90 degrees...
-		//		CGDirectDisplayID display = CGMainDisplayID();
-		//		io_service_t service = CGDisplayIOServicePort(display);
-		//		IOOptionBits options = (0x00000400 | (kIOScaleRotate90)  << 16);
-		//		IOServiceRequestProbe(service, options);
+		// CGDirectDisplayID display = CGMainDisplayID();
+		// io_service_t service = CGDisplayIOServicePort(display);
+		// IOOptionBits options = (0x00000400 | (kIOScaleRotate90)  << 16);
+		// IOServiceRequestProbe(service, options);
 		
+		/*
+		io_service_t service = CGDisplayIOServicePort(mQuery->displays().front()->getDeviceId());
+		task_port_t owningTask;
+		unsigned int type;
+		io_connect_t connect;
+		kern_return_t kern_id = IOFramebufferOpen( service, owningTask, type, &connect );
+		IOPixelAperture aperture;
+		IOFramebufferInformation info;
+		kern_return_t IOFBGetFramebufferInformationForAperture( connect, aperture, &info );
+		 */
 	}
 	
 	if (!success) {

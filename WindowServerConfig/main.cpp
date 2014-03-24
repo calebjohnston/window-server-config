@@ -32,6 +32,7 @@ int main(int argc, const char * argv[])
 	int device_id;
 	std::vector<int32_t> resolution;
 	std::string rotation_str;
+	int persistence;
 	
 	try {
 		po::options_description desc("Allowed options");
@@ -39,11 +40,12 @@ int main(int argc, const char * argv[])
 		("help,H", "produce help message")
 		("query,Q", "get all connected displays")
 		("modes,M", po::value<int>(&device_id), "query device modes for device id")
-		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees: 0, 90, 180, or 270")
+		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees (0, 90, 180, or 270)")
 		("resolution,S", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
 		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
-		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays");
+		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays")
+		("persistence,P", po::value<int>(&persistence)->default_value(1), "setting persistence (0=temporary or 1=permanent)");
 		
 		po::variables_map var_map;
 		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::default_style
@@ -100,6 +102,12 @@ int main(int argc, const char * argv[])
 		else if (! var_map.count("help"))
 		{
 			DisplayLayout display_layout;
+			
+			// set display arrangement persistence
+			if (persistence >= 0 && persistence < 2) {
+				persistence += 1;
+			}
+			display_layout.setPersistence(static_cast<DisplayLayout::Persistence>(persistence));
 			
 			// set display wall dimensions...
 			if (desired_rows > 0) display_layout.setDesiredRows(desired_rows);
