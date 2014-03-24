@@ -37,12 +37,12 @@ int main(int argc, const char * argv[])
 		("help,H", "produce help message")
 		("query,Q", "get all connected displays")
 		("modes,M", po::value<int>(&device_id), "query device modes for device id")
-		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees (0, 90, 180, or 270)")
+		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees (0, 90, 180, 270)")
 		("resolution,S", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
 		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
 		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays")
-		("persistence,P", po::value<int>(&persistence)->default_value(1), "setting persistence (0=temporary or 1=permanent)");
+		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)");
 		
 		po::variables_map var_map;
 		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::default_style

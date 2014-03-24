@@ -46,9 +46,10 @@ bool DisplayLayout::applyLayoutChanges()
 	
 	// verify that the right display mode exist for all displays
 	bool isResolutionSupported = true;
-	for (auto device_iter = mQuery->displays().begin(); device_iter != mQuery->displays().end(); device_iter++)
+	//for (auto device_iter = mQuery->displays().begin(); device_iter != mQuery->displays().end(); device_iter++)
+	for (const DisplayDeviceRef device : mQuery->displays())
 	{
-		const DisplayDeviceRef& device = *device_iter;
+		//const DisplayDeviceRef& device = *device_iter;
 		uint32_t resolution_x = device->getCurrentDisplayMode()->getWidth();
 		uint32_t resolution_y = device->getCurrentDisplayMode()->getHeight();
 		if (0 == mResWidth || 0 == mResHeight) {
@@ -61,8 +62,9 @@ bool DisplayLayout::applyLayoutChanges()
 			
 			// if the current display mode is not set to the desired display mode, then we will change it...
 			const std::vector<DisplayModeRef>& displayModes = device->getAllDisplayModes();
-			for (auto mode_iter = displayModes.begin(); mode_iter != displayModes.end(); mode_iter++) {
-				const DisplayModeRef& mode = *mode_iter;
+			//for (auto mode_iter = displayModes.begin(); mode_iter != displayModes.end(); mode_iter++) {
+			for (const DisplayModeRef mode : displayModes) {
+				//const DisplayModeRef& mode = *mode_iter;
 				resolution_x = mode->getWidth();
 				resolution_y = mode->getHeight();
 				if (desiredResolutionWidth() == resolution_x && desiredResolutionHeight() == resolution_y && mode->usableForDesktopGui()) {
@@ -103,21 +105,6 @@ bool DisplayLayout::applyLayoutChanges()
 		}
 	}
 	
-	/*
-	switch (mPrimary) {
-		case UPPER_LEFT:
-			break;
-			
-		case UPPER_RIGHT:
-			break;
-			
-		case LOWER_LEFT:
-			break;
-			
-		case LOWER_RIGHT:
-			break;
-	}*/
-	
 	// assign the proper setting context...
 	CGConfigureOption option;
 	switch (mPersistence) {
@@ -136,11 +123,30 @@ bool DisplayLayout::applyLayoutChanges()
 	result = CGCompleteDisplayConfiguration(mConfigRef, option);
 	bool success = (kCGErrorSuccess == result);
 	if (success) {
-		// rotate 90 degrees...
-		// CGDirectDisplayID display = CGMainDisplayID();
-		// io_service_t service = CGDisplayIOServicePort(display);
-		// IOOptionBits options = (0x00000400 | (kIOScaleRotate90)  << 16);
-		// IOServiceRequestProbe(service, options);
+		// Perform rotation...
+		IOOptionBits options;
+		switch (mOrientation) {
+			case NORMAL:
+				options = (0x00000400 | (kIOScaleRotate0)  << 16);
+				break;
+
+			case ROTATE_90:
+				options = (0x00000400 | (kIOScaleRotate90)  << 16);
+				break;
+
+			case ROTATE_180:
+				options = (0x00000400 | (kIOScaleRotate180)  << 16);
+				break;
+
+			case ROTATE_270:
+				options = (0x00000400 | (kIOScaleRotate270)  << 16);
+				break;
+		}
+		for (const DisplayDeviceRef device : mQuery->displays()) {
+			CGDirectDisplayID display = device->getDeviceId();
+			io_service_t service = CGDisplayIOServicePort(display);
+			IOServiceRequestProbe(service, options);
+		}
 		
 		/*
 		io_service_t service = CGDisplayIOServicePort(mQuery->displays().front()->getDeviceId());
