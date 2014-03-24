@@ -26,8 +26,8 @@ int main(int argc, const char * argv[])
 	
 //	float gvec[3] = {0.0, 0.0, -1.0};
 //	std::string output_prefix = "export_";
-	int desired_width;
-	int desired_height;
+	int desired_cols;
+	int desired_rows;
 	double refresh_rate;
 	int device_id;
 	std::vector<int32_t> resolution;
@@ -40,10 +40,10 @@ int main(int argc, const char * argv[])
 		("query,Q", "get all connected displays")
 		("modes,M", po::value<int>(&device_id), "query device modes for device id")
 		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees: 0, 90, 180, or 270")
-		("resolution,R", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
+		("resolution,S", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
-		("width,W", po::value<int>(&desired_width)->default_value(1), "display arrangement width (in displays)")
-		("height,H", po::value<int>(&desired_height)->default_value(1), "display arrangement height (in displays)");
+		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
+		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays");
 		
 		po::variables_map var_map;
 		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::default_style
@@ -52,12 +52,12 @@ int main(int argc, const char * argv[])
 		
 		po::notify(var_map);
 		
-		DisplayQuery dp;
-		
 		// make regular device query...
 		if (var_map.count("query")) {
+			DisplayQuery query;
+			
 			std::string output;
-			for (const DisplayDeviceRef device : dp.displays()) {
+			for (const DisplayDeviceRef device : query.displays()) {
 				output += device->toString();
 				output += "\n";
 			}
@@ -67,7 +67,9 @@ int main(int argc, const char * argv[])
 		}
 		
 		// make device query for all display modes using given device ID
-		if (var_map.count("modes")) {
+		else if (var_map.count("modes")) {
+			DisplayQuery query;
+			
 			// check input device id...
 			//if (var_map["modes"]) {
 			//	std::cout << "Must specify a device ID to query. " << std::endl;
@@ -75,7 +77,7 @@ int main(int argc, const char * argv[])
 			//}
 			std::string output;
 			int32_t dev_id = var_map["modes"].as<int32_t>();
-			const DisplayDeviceRef device = dp.getDisplay(dev_id);
+			const DisplayDeviceRef device = query.getDisplay(dev_id);
 			if (!device) {
 				std::cout << "There is no connected device with the device ID: " << dev_id << std::endl;
 				std::cout << "Query failed." << std::endl;
@@ -93,12 +95,17 @@ int main(int argc, const char * argv[])
 			return 0;
 		}
 		
-		if (var_map.count("rotation") || var_map.count("resolution") ||
-			var_map.count("refresh") || var_map.count("width") || var_map.count("height"))
+//		if (var_map.count("rotation") || var_map.count("resolution") ||
+//			var_map.count("refresh") || var_map.count("columns") || var_map.count("rows"))
+		else if (! var_map.count("help"))
 		{
-			DisplayLayout dl;
-			dl.setDesiredHeight(desired_height);
-			dl.setDesiredWidth(desired_width);
+			DisplayLayout display_layout;
+			
+			// set display wall dimensions...
+			if (desired_rows > 0) display_layout.setDesiredRows(desired_rows);
+			if (desired_cols > 0) display_layout.setDesiredColumns(desired_cols);
+			
+			// set display orientation... NOT YET IMPLEMENTED!!
 			DisplayLayout::Orientation rotation;
 			if ("90" == rotation_str) {
 				rotation = DisplayLayout::ROTATE_90;
@@ -112,8 +119,16 @@ int main(int argc, const char * argv[])
 			else {
 				rotation = DisplayLayout::NORMAL;
 			}
-			dl.setDesiredOrientation(rotation);
-			dl.setDesiredResolution(resolution[0], resolution[1]);
+			display_layout.setDesiredOrientation(rotation);
+			
+			// set display resolution...
+			if (var_map.count("resolution")) {
+				display_layout.setDesiredResolution(resolution[0], resolution[1]);
+			}
+			
+			bool success = display_layout.applyLayoutChanges();
+			
+			return success? 0: 1;
 		}
 	
 		std::cout << "Usage: " << argv[0] << " [options]" << std::endl;

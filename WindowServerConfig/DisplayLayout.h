@@ -36,15 +36,15 @@ public:
 	DisplayLayout();
 	~DisplayLayout();
 	
-	void setDesiredResolution(const uint32_t _x, const uint32_t _y) { mResX = _x; mResY = _y; }
-	uint32_t desiredResolutionX() const { return mResX; }
-	uint32_t desiredResolutionY() const { return mResY; }
+	void setDesiredResolution(const uint32_t width, const uint32_t height) { mResWidth = width; mResHeight = height; }
+	uint32_t desiredResolutionWidth() const { return mResWidth; }
+	uint32_t desiredResolutionHeight() const { return mResHeight; }
 	
-	void setDesiredWidth(const uint8_t width) { mWidth = width; }
-	uint8_t desiredWidth() const { return mWidth; }
+	void setDesiredColumns(const uint8_t width) { mColumns = width; }
+	uint8_t desiredColumns() const { return mColumns; }
 	
-	void setDesiredHeight(const uint8_t height) { mHeight = height; }
-	uint8_t desiredHeight() const { return mHeight; }
+	void setDesiredRows(const uint8_t height) { mRows = height; }
+	uint8_t desiredRows() const { return mRows; }
 	
 	void setDesiredOrientation(const Orientation orientation) { mOrientation = orientation; }
 	Orientation desiredOrientation() const { return mOrientation; }
@@ -52,11 +52,13 @@ public:
 	void setPrimaryDisplay(const Corner display) { mPrimary = display; }
 	Corner primaryDisplay() const { return mPrimary; }
 	
+	bool applyLayoutChanges();
+	
 private:
-	uint32_t mResX;
-	uint32_t mResY;
-	uint8_t mWidth;
-	uint8_t mHeight;
+	uint32_t mResWidth;
+	uint32_t mResHeight;
+	uint8_t mColumns;
+	uint8_t mRows;
 	Orientation mOrientation;
 	Corner mPrimary;
 	

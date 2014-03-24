@@ -25,6 +25,10 @@ public:
 	DisplayMode(const CGDirectDisplayID display);
 	~DisplayMode();
 	
+	CGDisplayModeRef getNativePtr() const { return mModeRef; }
+	uint32_t getWidth() const { return static_cast<uint32_t>(mWidth); }
+	uint32_t getHeight() const { return static_cast<uint32_t>(mHeight); }
+	bool usableForDesktopGui() const { return mUsableForDesktopGui; }
 	std::string toString() const;
 	
 private:
@@ -48,7 +52,7 @@ public:
 	~DisplayDevice();
 	
 	CGDirectDisplayID getDeviceId() const { return mDeviceId; }
-	CGDisplayModeRef getCurrentDisplayMode() const { return mCurrentDisplayMode ? mCurrentDisplayMode->mModeRef : static_cast<CGDisplayModeRef>(0); }
+	DisplayModeRef getCurrentDisplayMode() const { return mCurrentDisplayMode; }
 	const std::vector<DisplayModeRef>& getAllDisplayModes() const { return mAllSupportedDisplayModes; }
 	
 	std::string toString() const;
