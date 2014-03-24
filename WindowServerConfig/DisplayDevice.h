@@ -12,10 +12,15 @@
 #include <CoreGraphics/CGDisplayConfiguration.h>
 
 #include <memory>
+#include <vector>
 #include <string>
+
+typedef std::shared_ptr<class DisplayMode> DisplayModeRef;
+typedef std::shared_ptr<class DisplayDevice> DisplayDeviceRef;
 
 class DisplayMode {
 public:
+	DisplayMode() : mModeRef(0) {};
 	DisplayMode(CGDisplayModeRef mode);
 	DisplayMode(const CGDirectDisplayID display);
 	~DisplayMode();
@@ -25,50 +30,53 @@ public:
 private:
 	friend class DisplayDevice;
 	
-	CGDisplayModeRef modeRef;
-	CFTypeID type;
-	double refreshRate;
-	uint32_t ioFlags;
-	uint32_t ioModeId;
-	size_t height;
-	size_t width;
-	CFStringRef copyPixelEncoding;
-	bool usableForDesktopGui;
+	CGDisplayModeRef mModeRef;
+	CFTypeID mType;
+	double mRefreshRate;
+	uint32_t mIoFlags;
+	uint32_t mIoModeId;
+	size_t mHeight;
+	size_t mWidth;
+	CFStringRef mCopyPixelEncoding;
+	bool mUsableForDesktopGui;
 };
 
 class DisplayDevice {
 public:
+	DisplayDevice() {};
 	DisplayDevice(const CGDirectDisplayID display);
 	~DisplayDevice();
 	
-	CGDirectDisplayID getDeviceId() const { return deviceId; }
-	CGDisplayModeRef getCurrentDisplayMode() const { return displayMode->modeRef; }
+	CGDirectDisplayID getDeviceId() const { return mDeviceId; }
+	CGDisplayModeRef getCurrentDisplayMode() const { return mCurrentDisplayMode ? mCurrentDisplayMode->mModeRef : static_cast<CGDisplayModeRef>(0); }
+	const std::vector<DisplayModeRef>& getAllDisplayModes() const { return mAllSupportedDisplayModes; }
 	
 	std::string toString() const;
 	std::string displayName() const;
 	
 private:
-	CGDirectDisplayID deviceId;
-	std::shared_ptr<DisplayMode> displayMode;
+	CGDirectDisplayID mDeviceId;
+	DisplayModeRef mCurrentDisplayMode;
+	std::vector<DisplayModeRef> mAllSupportedDisplayModes;
 	
-	CGRect displayBoundary;
-	CGColorSpaceRef colorSpace;
-	uint32_t gammaTableCapacity;
-	CGContextRef drawingContext;
-	bool isActive;
-	bool isAlwaysInMirrorSet;
-	bool isAsleep;
-	bool isBuiltin;
-	bool isInHWMirrorSet;
-	bool isInMirrorSet;
-	bool isMain;
-	bool isOnline;
-	bool isStereo;
-	bool usesOpenGLAcceleration;
-	double rotation;
-	CGSize screenSize;
-	uint32_t modelNumber;
-	uint32_t serialNumber;
-	uint32_t unitNumber;
-	uint32_t vendorNumber;
+	CGRect mDisplayBoundary;
+	CGColorSpaceRef mColorSpace;
+	uint32_t mGammaTableCapacity;
+	CGContextRef mDrawingContext;
+	bool mIsActive;
+	bool mIsAlwaysInMirrorSet;
+	bool mIsAsleep;
+	bool mIsBuiltin;
+	bool mIsInHWMirrorSet;
+	bool mIsInMirrorSet;
+	bool mIsMain;
+	bool mIsOnline;
+	bool mIsStereo;
+	bool mUsesOpenGLAcceleration;
+	double mRotation;
+	CGSize mScreenSize;
+	uint32_t mModelNumber;
+	uint32_t mSerialNumber;
+	uint32_t mUnitNumber;
+	uint32_t mVendorNumber;
 };

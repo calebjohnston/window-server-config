@@ -27,8 +27,7 @@ DisplayQuery::DisplayQuery()
 	
 	if (kCGErrorSuccess == err) {
 		for (size_t index = 0; index < total; index++) {
-			//DisplayDevice* device = [[DisplayDevice alloc] initWithDisplay:displays[index]];
-			DisplayDevice device(displays[index]);
+			DisplayDeviceRef device = std::make_shared<DisplayDevice>(displays[index]);
 			mDisplays.push_back(device);
 		}
 	}
@@ -36,28 +35,16 @@ DisplayQuery::DisplayQuery()
 
 DisplayQuery::~DisplayQuery()
 {
-	
-	
-	
-//	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes([mQuery->displays().front() getDeviceId], NULL);
-//	CFIndex index, count = CFArrayGetCount(displayModes);
-//	for (index = 0; index < count; index++) {
-//		CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, index);
-//		DisplayMode* dmode = [[DisplayMode alloc] initWithDisplayMode:mode];
-//		std::cout << [[dmode toNSString] UTF8String] << std::endl;
-//	}
-	
+	mDisplays.clear();
 }
 
-std::string DisplayQuery::toString()
+const DisplayDeviceRef DisplayQuery::getDisplay(const int32_t deviceId) const
 {
-	std::string output;
-	
-	for (DisplayDevice device : mDisplays) {
-		output += device.toString();
-		output += "\n";
+	for (const DisplayDeviceRef device : mDisplays) {
+		if (device->getDeviceId() == deviceId) {
+			return device;
+		}
 	}
 	
-	return output;
+	return DisplayDeviceRef(0);
 }
-

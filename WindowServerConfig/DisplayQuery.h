@@ -18,10 +18,11 @@ public:
 	DisplayQuery();
 	~DisplayQuery();
 	
-	std::string toString();
-	const std::vector<DisplayDevice>& displays() const { return mDisplays; }
+	const DisplayDeviceRef getDisplay(const int32_t deviceId) const;
+	
+	const std::vector<DisplayDeviceRef>& displays() const { return mDisplays; }
 	
 private:
-	std::vector<DisplayDevice> mDisplays;
+	std::vector<DisplayDeviceRef> mDisplays;
 };
 
