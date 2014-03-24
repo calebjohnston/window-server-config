@@ -11,11 +11,11 @@
 	#import <Foundation/Foundation.h>
 	#import <CoreGraphics/CoreGraphics.h>
 	#import <IOKit/IOKitLib.h>
-	#import "DisplayDevice.h"
 #endif
 
 #include <iostream>
 
+#include "DisplayDevice.h"
 #include "DisplayQuery.h"
 
 DisplayQuery::DisplayQuery()
@@ -27,7 +27,8 @@ DisplayQuery::DisplayQuery()
 	
 	if (kCGErrorSuccess == err) {
 		for (size_t index = 0; index < total; index++) {
-			DisplayDevice* device = [[DisplayDevice alloc] initWithDisplay:displays[index]];
+			//DisplayDevice* device = [[DisplayDevice alloc] initWithDisplay:displays[index]];
+			DisplayDevice device(displays[index]);
 			mDisplays.push_back(device);
 		}
 	}
@@ -50,14 +51,13 @@ DisplayQuery::~DisplayQuery()
 
 std::string DisplayQuery::toString()
 {
-	NSString* output = [[NSString alloc] init];
+	std::string output;
 	
-	for (DisplayDevice* device : mDisplays) {
-		NSString* dspl = [device toNSString];
-		output = [output stringByAppendingString:dspl];
-		output = [output stringByAppendingString:@"\n"];
+	for (DisplayDevice device : mDisplays) {
+		output += device.toString();
+		output += "\n";
 	}
 	
-	return std::string([output UTF8String]);
+	return output;
 }
 

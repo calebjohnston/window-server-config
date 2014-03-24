@@ -53,6 +53,7 @@ private:
 	uint8_t mHeight;
 	Orientation mOrientation;
 	Corner mPrimary;
+	
 	std::shared_ptr<DisplayQuery> mQuery;
 	CGDisplayConfigRef mConfigRef;
 };
