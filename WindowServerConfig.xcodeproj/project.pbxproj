@@ -9,14 +9,13 @@
 /* Begin PBXBuildFile section */
 		3C72376918DBC80000ED73D9 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3C72376818DBC80000ED73D9 /* main.cpp */; };
 		3C72376B18DBC80000ED73D9 /* WindowServerConfig.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3C72376A18DBC80000ED73D9 /* WindowServerConfig.1 */; };
-		3C72377218DBC8A000ED73D9 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377118DBC8A000ED73D9 /* libboost_filesystem-mt.dylib */; };
-		3C72377418DBC8BD00ED73D9 /* libboost_program_options-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377318DBC8BD00ED73D9 /* libboost_program_options-mt.dylib */; };
 		3C72377718DBC8ED00ED73D9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377618DBC8ED00ED73D9 /* IOKit.framework */; };
 		3C72377918DBC8F200ED73D9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377818DBC8F200ED73D9 /* CoreGraphics.framework */; };
 		3C72377B18DBC8F700ED73D9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C72377A18DBC8F700ED73D9 /* Foundation.framework */; };
 		3C72377E18DBCDC700ED73D9 /* DisplayQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */; };
-		3C72378118DBCF9100ED73D9 /* DisplayDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378018DBCF9100ED73D9 /* DisplayDevice.m */; };
+		3C72378118DBCF9100ED73D9 /* DisplayDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378018DBCF9100ED73D9 /* DisplayDevice.mm */; };
 		3C72378418DBF1F200ED73D9 /* DisplayLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */; };
+		3C8EDFDB18DFDCBE00CD157B /* libboost_program_options-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C8EDFDA18DFDCBE00CD157B /* libboost_program_options-mt.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,17 +35,16 @@
 		3C72376518DBC80000ED73D9 /* WindowServerConfig */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = WindowServerConfig; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C72376818DBC80000ED73D9 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3C72376A18DBC80000ED73D9 /* WindowServerConfig.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = WindowServerConfig.1; sourceTree = "<group>"; };
-		3C72377118DBC8A000ED73D9 /* libboost_filesystem-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_filesystem-mt.dylib"; path = "/opt/local/lib/libboost_filesystem-mt.dylib"; sourceTree = "<absolute>"; };
-		3C72377318DBC8BD00ED73D9 /* libboost_program_options-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_program_options-mt.dylib"; path = "/opt/local/lib/libboost_program_options-mt.dylib"; sourceTree = "<absolute>"; };
 		3C72377618DBC8ED00ED73D9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		3C72377818DBC8F200ED73D9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3C72377A18DBC8F700ED73D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3C72377C18DBCDC700ED73D9 /* DisplayQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayQuery.h; sourceTree = "<group>"; };
 		3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayQuery.mm; sourceTree = "<group>"; };
 		3C72377F18DBCF9100ED73D9 /* DisplayDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayDevice.h; sourceTree = "<group>"; };
-		3C72378018DBCF9100ED73D9 /* DisplayDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayDevice.m; sourceTree = "<group>"; };
+		3C72378018DBCF9100ED73D9 /* DisplayDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayDevice.mm; sourceTree = "<group>"; };
 		3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DisplayLayout.mm; sourceTree = "<group>"; };
 		3C72378318DBF1F200ED73D9 /* DisplayLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayLayout.h; sourceTree = "<group>"; };
+		3C8EDFDA18DFDCBE00CD157B /* libboost_program_options-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_program_options-mt.a"; path = "../../../../../opt/local/lib/libboost_program_options-mt.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,11 +52,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C8EDFDB18DFDCBE00CD157B /* libboost_program_options-mt.a in Frameworks */,
 				3C72377B18DBC8F700ED73D9 /* Foundation.framework in Frameworks */,
 				3C72377918DBC8F200ED73D9 /* CoreGraphics.framework in Frameworks */,
 				3C72377718DBC8ED00ED73D9 /* IOKit.framework in Frameworks */,
-				3C72377418DBC8BD00ED73D9 /* libboost_program_options-mt.dylib in Frameworks */,
-				3C72377218DBC8A000ED73D9 /* libboost_filesystem-mt.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +87,7 @@
 				3C72377C18DBCDC700ED73D9 /* DisplayQuery.h */,
 				3C72377D18DBCDC700ED73D9 /* DisplayQuery.mm */,
 				3C72377F18DBCF9100ED73D9 /* DisplayDevice.h */,
-				3C72378018DBCF9100ED73D9 /* DisplayDevice.m */,
+				3C72378018DBCF9100ED73D9 /* DisplayDevice.mm */,
 				3C72378318DBF1F200ED73D9 /* DisplayLayout.h */,
 				3C72378218DBF1F200ED73D9 /* DisplayLayout.mm */,
 			);
@@ -100,11 +97,10 @@
 		3C72377518DBC8D800ED73D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3C8EDFDA18DFDCBE00CD157B /* libboost_program_options-mt.a */,
 				3C72377A18DBC8F700ED73D9 /* Foundation.framework */,
 				3C72377818DBC8F200ED73D9 /* CoreGraphics.framework */,
 				3C72377618DBC8ED00ED73D9 /* IOKit.framework */,
-				3C72377318DBC8BD00ED73D9 /* libboost_program_options-mt.dylib */,
-				3C72377118DBC8A000ED73D9 /* libboost_filesystem-mt.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -160,7 +156,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C72378118DBCF9100ED73D9 /* DisplayDevice.m in Sources */,
+				3C72378118DBCF9100ED73D9 /* DisplayDevice.mm in Sources */,
 				3C72376918DBC80000ED73D9 /* main.cpp in Sources */,
 				3C72377E18DBCDC700ED73D9 /* DisplayQuery.mm in Sources */,
 				3C72378418DBF1F200ED73D9 /* DisplayLayout.mm in Sources */,

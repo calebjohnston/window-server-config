@@ -6,59 +6,77 @@
 //  Copyright (c) 2014 Caleb Johnston. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#pragma once
 
-@interface DisplayMode : NSObject
+#include <CoreGraphics/CoreGraphics.h>
+#include <CoreGraphics/CGDisplayConfiguration.h>
 
-@property (nonatomic) CGDisplayModeRef modeRef;
-@property (nonatomic) CFTypeID type;
-@property (nonatomic) double refreshRate;
-@property (nonatomic) uint32_t ioFlags;
-@property (nonatomic) uint32_t ioModeId;
-@property (nonatomic) size_t height;
-@property (nonatomic) size_t width;
-@property (nonatomic) CFStringRef copyPixelEncoding;
-@property (nonatomic) BOOL usableForDesktopGui;
+#include <memory>
+#include <vector>
+#include <string>
 
-- (id) initWithDisplayMode:(CGDisplayModeRef) mode;
-- (id) initWithDisplay:(CGDirectDisplayID) display;
-- (NSString*) toNSString;
+typedef std::shared_ptr<class DisplayMode> DisplayModeRef;
+typedef std::shared_ptr<class DisplayDevice> DisplayDeviceRef;
 
-@end
-
-@interface DisplayDevice : NSObject
-{
-	CGDirectDisplayID deviceId;
-	DisplayMode* displayMode;
+class DisplayMode {
+public:
+	DisplayMode() : mModeRef(0) {};
+	DisplayMode(CGDisplayModeRef mode);
+	DisplayMode(const CGDirectDisplayID display);
+	~DisplayMode();
 	
-//	CGError CGDisplayMoveCursorToPoint;	// cool!
-}
+	std::string toString() const;
+	
+private:
+	friend class DisplayDevice;
+	
+	CGDisplayModeRef mModeRef;
+	CFTypeID mType;
+	double mRefreshRate;
+	uint32_t mIoFlags;
+	uint32_t mIoModeId;
+	size_t mHeight;
+	size_t mWidth;
+	CFStringRef mCopyPixelEncoding;
+	bool mUsableForDesktopGui;
+};
 
-@property (nonatomic) CGRect displayBoundary;
-@property (nonatomic) CGColorSpaceRef colorSpace;
-@property (nonatomic) uint32_t gammaTableCapacity;
-@property (nonatomic) CGContextRef drawingContext;
-@property (nonatomic) BOOL isActive;
-@property (nonatomic) BOOL isAlwaysInMirrorSet;
-@property (nonatomic) BOOL isAsleep;
-@property (nonatomic) BOOL isBuiltin;
-@property (nonatomic) BOOL isInHWMirrorSet;
-@property (nonatomic) BOOL isInMirrorSet;
-@property (nonatomic) BOOL isMain;
-@property (nonatomic) BOOL isOnline;
-@property (nonatomic) BOOL isStereo;
-@property (nonatomic) BOOL usesOpenGLAcceleration;
-@property (nonatomic) double rotation;
-@property (nonatomic) CGSize screenSize;
-@property (nonatomic) uint32_t modelNumber;
-@property (nonatomic) uint32_t serialNumber;
-@property (nonatomic) uint32_t unitNumber;
-@property (nonatomic) uint32_t vendorNumber;
-
-- (id) initWithDisplay:(CGDirectDisplayID) display;
-- (CGDirectDisplayID) getDeviceId;
-- (CGDisplayModeRef) getMode;
-- (NSString*) toNSString;
-- (NSString*) displayNameFromDisplayId:(CGDirectDisplayID) display;
-
-@end
+class DisplayDevice {
+public:
+	DisplayDevice() {};
+	DisplayDevice(const CGDirectDisplayID display);
+	~DisplayDevice();
+	
+	CGDirectDisplayID getDeviceId() const { return mDeviceId; }
+	CGDisplayModeRef getCurrentDisplayMode() const { return mCurrentDisplayMode ? mCurrentDisplayMode->mModeRef : static_cast<CGDisplayModeRef>(0); }
+	const std::vector<DisplayModeRef>& getAllDisplayModes() const { return mAllSupportedDisplayModes; }
+	
+	std::string toString() const;
+	std::string displayName() const;
+	
+private:
+	CGDirectDisplayID mDeviceId;
+	DisplayModeRef mCurrentDisplayMode;
+	std::vector<DisplayModeRef> mAllSupportedDisplayModes;
+	
+	CGRect mDisplayBoundary;
+	CGColorSpaceRef mColorSpace;
+	uint32_t mGammaTableCapacity;
+	CGContextRef mDrawingContext;
+	bool mIsActive;
+	bool mIsAlwaysInMirrorSet;
+	bool mIsAsleep;
+	bool mIsBuiltin;
+	bool mIsInHWMirrorSet;
+	bool mIsInMirrorSet;
+	bool mIsMain;
+	bool mIsOnline;
+	bool mIsStereo;
+	bool mUsesOpenGLAcceleration;
+	double mRotation;
+	CGSize mScreenSize;
+	uint32_t mModelNumber;
+	uint32_t mSerialNumber;
+	uint32_t mUnitNumber;
+	uint32_t mVendorNumber;
+};

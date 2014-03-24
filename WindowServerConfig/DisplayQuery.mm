@@ -11,11 +11,11 @@
 	#import <Foundation/Foundation.h>
 	#import <CoreGraphics/CoreGraphics.h>
 	#import <IOKit/IOKitLib.h>
-	#import "DisplayDevice.h"
 #endif
 
 #include <iostream>
 
+#include "DisplayDevice.h"
 #include "DisplayQuery.h"
 
 DisplayQuery::DisplayQuery()
@@ -27,7 +27,7 @@ DisplayQuery::DisplayQuery()
 	
 	if (kCGErrorSuccess == err) {
 		for (size_t index = 0; index < total; index++) {
-			DisplayDevice* device = [[DisplayDevice alloc] initWithDisplay:displays[index]];
+			DisplayDeviceRef device = std::make_shared<DisplayDevice>(displays[index]);
 			mDisplays.push_back(device);
 		}
 	}
@@ -35,29 +35,16 @@ DisplayQuery::DisplayQuery()
 
 DisplayQuery::~DisplayQuery()
 {
-	
-	
-	
-//	CFArrayRef displayModes = CGDisplayCopyAllDisplayModes([mQuery->displays().front() getDeviceId], NULL);
-//	CFIndex index, count = CFArrayGetCount(displayModes);
-//	for (index = 0; index < count; index++) {
-//		CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, index);
-//		DisplayMode* dmode = [[DisplayMode alloc] initWithDisplayMode:mode];
-//		std::cout << [[dmode toNSString] UTF8String] << std::endl;
-//	}
-	
+	mDisplays.clear();
 }
 
-std::string DisplayQuery::toString()
+const DisplayDeviceRef DisplayQuery::getDisplay(const int32_t deviceId) const
 {
-	NSString* output = [[NSString alloc] init];
-	
-	for (DisplayDevice* device : mDisplays) {
-		NSString* dspl = [device toNSString];
-		output = [output stringByAppendingString:dspl];
-		output = [output stringByAppendingString:@"\n"];
+	for (const DisplayDeviceRef device : mDisplays) {
+		if (device->getDeviceId() == deviceId) {
+			return device;
+		}
 	}
 	
-	return std::string([output UTF8String]);
+	return DisplayDeviceRef(0);
 }
-

@@ -36,6 +36,10 @@ public:
 	DisplayLayout();
 	~DisplayLayout();
 	
+	void setDesiredResolution(const uint32_t _x, const uint32_t _y) { mResX = _x; mResY = _y; }
+	uint32_t desiredResolutionX() const { return mResX; }
+	uint32_t desiredResolutionY() const { return mResY; }
+	
 	void setDesiredWidth(const uint8_t width) { mWidth = width; }
 	uint8_t desiredWidth() const { return mWidth; }
 	
@@ -49,10 +53,13 @@ public:
 	Corner primaryDisplay() const { return mPrimary; }
 	
 private:
+	uint32_t mResX;
+	uint32_t mResY;
 	uint8_t mWidth;
 	uint8_t mHeight;
 	Orientation mOrientation;
 	Corner mPrimary;
+	
 	std::shared_ptr<DisplayQuery> mQuery;
 	CGDisplayConfigRef mConfigRef;
 };
