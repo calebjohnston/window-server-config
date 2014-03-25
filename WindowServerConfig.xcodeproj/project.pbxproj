@@ -108,9 +108,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3C72376418DBC80000ED73D9 /* WindowServerConfig */ = {
+		3C72376418DBC80000ED73D9 /* displaycfg */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3C72376E18DBC80000ED73D9 /* Build configuration list for PBXNativeTarget "WindowServerConfig" */;
+			buildConfigurationList = 3C72376E18DBC80000ED73D9 /* Build configuration list for PBXNativeTarget "displaycfg" */;
 			buildPhases = (
 				3C72376118DBC80000ED73D9 /* Sources */,
 				3C72376218DBC80000ED73D9 /* Frameworks */,
@@ -120,7 +120,7 @@
 			);
 			dependencies = (
 			);
-			name = WindowServerConfig;
+			name = displaycfg;
 			productName = WindowServerConfig;
 			productReference = 3C72376518DBC80000ED73D9 /* WindowServerConfig */;
 			productType = "com.apple.product-type.tool";
@@ -146,7 +146,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3C72376418DBC80000ED73D9 /* WindowServerConfig */,
+				3C72376418DBC80000ED73D9 /* displaycfg */,
 			);
 		};
 /* End PBXProject section */
@@ -284,7 +284,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3C72376E18DBC80000ED73D9 /* Build configuration list for PBXNativeTarget "WindowServerConfig" */ = {
+		3C72376E18DBC80000ED73D9 /* Build configuration list for PBXNativeTarget "displaycfg" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3C72376F18DBC80000ED73D9 /* Debug */,

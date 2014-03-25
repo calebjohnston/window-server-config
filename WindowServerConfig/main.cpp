@@ -23,13 +23,13 @@ namespace po = boost::program_options;
 
 int main(int argc, const char * argv[])
 {
-	int desired_cols;
-	int desired_rows;
-	double refresh_rate;
-	int device_id;
+	int desired_cols = 0;
+	int desired_rows = 0;
+	double refresh_rate = 0.0;
+	int device_id = 0;
 	std::vector<int32_t> resolution;
 	std::string rotation_str;
-	int persistence;
+	int persistence = 0;
 	
 	try {
 		po::options_description desc("Allowed options");
@@ -38,21 +38,25 @@ int main(int argc, const char * argv[])
 		("query,Q", "get all connected displays")
 		("modes,M", po::value<int>(&device_id), "query device modes for device id")
 		("rotation,O", po::value<std::string>(&rotation_str), "desired rotation in degrees (0, 90, 180, 270)")
-		("resolution,S", po::value< std::vector<int> >(&resolution)->multitoken(), "[ width height ]")
+		("resolution,S", po::value< std::vector<int> >(&resolution)->multitoken(), "target resolution ( width height )")
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
 		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
 		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays")
 		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)");
 		
 		po::variables_map var_map;
-		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::default_style
+		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::unix_style
 																		  | po::command_line_style::allow_slash_for_short
 																		  | po::command_line_style::allow_long_disguise).run(), var_map);
-		
 		po::notify(var_map);
 		
 		// make regular device query...
-		if (var_map.count("query")) {
+		if (var_map.count("help")) {
+			std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+			std::cout << desc << std::endl;
+			return 0;
+		}
+		else if (var_map.count("query")) {
 			DisplayQuery query;
 			
 			std::string output;
@@ -93,11 +97,7 @@ int main(int argc, const char * argv[])
 			
 			return 0;
 		}
-		
-//		if (var_map.count("rotation") || var_map.count("resolution") ||
-//			var_map.count("refresh") || var_map.count("columns") || var_map.count("rows"))
-		else if (! var_map.count("help"))
-		{
+		else if (argc > 1) {
 			DisplayLayout display_layout;
 			
 			// set display arrangement persistence
@@ -110,7 +110,7 @@ int main(int argc, const char * argv[])
 			if (desired_rows > 0) display_layout.setDesiredRows(desired_rows);
 			if (desired_cols > 0) display_layout.setDesiredColumns(desired_cols);
 			
-			// set display orientation... NOT YET IMPLEMENTED!!
+			// set display orientation... 
 			DisplayLayout::Orientation rotation;
 			if ("90" == rotation_str) {
 				rotation = DisplayLayout::ROTATE_90;
@@ -135,11 +135,13 @@ int main(int argc, const char * argv[])
 			
 			return success? 0: 1;
 		}
-	
-		std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
-		std::cout << desc << std::endl;
+		else {
+			std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+			std::cout << desc << std::endl;
+		}
 	}
 	catch(std::exception& e) {
+		std::cerr << "Exception: " << e.what() << std::endl;
 		return 1;
 	}
 	catch(...) {

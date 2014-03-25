@@ -38,7 +38,7 @@ bool DisplayLayout::applyLayoutChanges()
 	
 	// perform device query
 	mQuery = std::make_shared<DisplayQuery>();
-	CGError capture_err = CGCaptureAllDisplays();
+	CGError capture_err = CGCaptureAllDisplaysWithOptions(kCGCaptureNoFill);
 	if (kCGErrorSuccess != capture_err) {
 		std::cout << "Could not capture displays: " << capture_err << std::endl;
 		return false;
@@ -164,6 +164,8 @@ bool DisplayLayout::applyLayoutChanges()
 	else {
 		std::cerr << "Configure Completion error : " << result << std::endl;
 	}
+	
+	CGReleaseAllDisplays();
 	
 	return success;
 }
