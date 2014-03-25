@@ -74,10 +74,6 @@ int main(int argc, const char * argv[])
 			DisplayQuery query;
 			
 			// check input device id...
-			//if (var_map["modes"]) {
-			//	std::cout << "Must specify a device ID to query. " << std::endl;
-			//	return 1;
-			//}
 			std::string output;
 			int32_t dev_id = var_map["modes"].as<int32_t>();
 			const DisplayDeviceRef device = query.getDisplay(dev_id);

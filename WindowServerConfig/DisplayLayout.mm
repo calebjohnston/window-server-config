@@ -32,7 +32,7 @@ bool DisplayLayout::applyLayoutChanges()
 	// begin configuration
 	CGError err = CGBeginDisplayConfiguration(&mConfigRef);
 	if (kCGErrorSuccess != err) {
-		std::cout << "Could not begin reconfiguration: " << err << std::endl;
+		std::cout << "Error! Could not begin reconfiguration: " << err << std::endl;
 		return false;
 	}
 	
@@ -40,7 +40,7 @@ bool DisplayLayout::applyLayoutChanges()
 	mQuery = std::make_shared<DisplayQuery>();
 	CGError capture_err = CGCaptureAllDisplaysWithOptions(kCGCaptureNoFill);
 	if (kCGErrorSuccess != capture_err) {
-		std::cout << "Could not capture displays: " << capture_err << std::endl;
+		std::cout << "Error! Could not capture displays: " << capture_err << std::endl;
 		return false;
 	}
 	
@@ -83,7 +83,8 @@ bool DisplayLayout::applyLayoutChanges()
 			
 			// maybe should not do this ...
 			if (!isResolutionSupported) {
-				std::cerr << "Desired resolution (" << mResWidth << "x" << mResHeight << ") not supported on all displays. Attempting best fit..." << std::endl;
+				std::cerr << "Desired resolution (" << mResWidth << "x" << mResHeight << ") not supported on device id: ";
+				std::cerr << device->getDeviceId() << ". Attempting best fit..." << std::endl;
 			}
 		}
 	}
@@ -98,7 +99,7 @@ bool DisplayLayout::applyLayoutChanges()
 			
 			result = CGConfigureDisplayOrigin(mConfigRef, mQuery->displays().at(index)->getDeviceId(), x * mResWidth, y * mResHeight);
 			if (kCGErrorSuccess != result) {
-				std::cerr << "Could not update display position! Error: " << result << " for device id: ";
+				std::cerr << "Error! Could not update display position for device id: ";
 				std::cerr << mQuery->displays().at(index)->getDeviceId() << std::endl;
 				return false;
 			}
@@ -162,7 +163,7 @@ bool DisplayLayout::applyLayoutChanges()
 		mConfigRef = nullptr;
 	}
 	else {
-		std::cerr << "Configure Completion error : " << result << std::endl;
+		std::cerr << "Error! Could not apply configuration: " << result << std::endl;
 	}
 	
 	CGReleaseAllDisplays();
