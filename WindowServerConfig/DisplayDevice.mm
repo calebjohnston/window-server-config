@@ -65,6 +65,15 @@ std::string DisplayMode::toString() const
 	return output_str.str();
 }
 
+DisplayDevice::DisplayDevice()
+:	mDeviceId(0), mDisplayBoundary(CGRectZero), mGammaTableCapacity(0), mIsActive(false), mIsOnline(false),
+	mIsAsleep(false), mIsBuiltin(false), mIsAlwaysInMirrorSet(false), mIsInHWMirrorSet(false), mIsMain(false),
+	mIsStereo(false), mIsInMirrorSet(false), mUsesOpenGLAcceleration(false), mScreenSize(CGSizeZero),
+	mModelNumber(0), mSerialNumber(0), mUnitNumber(0), mVendorNumber(0)
+{
+	
+}
+
 DisplayDevice::DisplayDevice(const CGDirectDisplayID display)
 {
 	mDeviceId = display;

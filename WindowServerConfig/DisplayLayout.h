@@ -16,6 +16,14 @@
 
 #include "DisplayQuery.h"
 
+/**
+ * The DisplayLayout class is designed to accumulate configuration parameters and 
+ * apply those settings to all connected displays when applyLayoutChanges() is invoked.
+ *
+ * @see DisplayDevice
+ * @see DisplayQuery
+ * @see https://developer.apple.com/library/mac/documentation/graphicsimaging/Conceptual/QuartzDisplayServicesConceptual/Articles/DisplayTransactions.html
+ */
 class DisplayLayout {
 public:
 	typedef enum orientation_t {
@@ -39,28 +47,37 @@ public:
 	} Persistence;
 	
 public:
+	//! C-store initializes all internal data
 	DisplayLayout();
+	//! D-store de-allocs all internal data
 	~DisplayLayout();
 	
+	//! Accessor method for the desired resolution
 	void setDesiredResolution(const uint32_t width, const uint32_t height) { mResWidth = width; mResHeight = height; }
 	uint32_t desiredResolutionWidth() const { return mResWidth; }
 	uint32_t desiredResolutionHeight() const { return mResHeight; }
 	
+	//! Accessor method for the desired number of columns in a display wall
 	void setDesiredColumns(const uint8_t width) { mColumns = width; }
 	uint8_t desiredColumns() const { return mColumns; }
 	
+	//! Accessor method for the desired number of rows in a display wall
 	void setDesiredRows(const uint8_t height) { mRows = height; }
 	uint8_t desiredRows() const { return mRows; }
 	
+	//! Accessor method for the desired rotation of the current screen
 	void setDesiredOrientation(const Orientation orientation) { mOrientation = orientation; }
 	Orientation desiredOrientation() const { return mOrientation; }
+
+	// Currently not implemented
+	//void setPrimaryDisplay(const Corner display) { mPrimary = display; }
+	//Corner primaryDisplay() const { return mPrimary; }
 	
-	void setPrimaryDisplay(const Corner display) { mPrimary = display; }
-	Corner primaryDisplay() const { return mPrimary; }
-	
+	//! Accessor method to enable or disable the permanent or temporary status of the changes
 	void setPersistence(const Persistence setting) { mPersistence = setting; }
 	Persistence persistence() const { return mPersistence; }
 	
+	//! Takes the input data and executes the configuration change
 	bool applyLayoutChanges();
 	
 private:
