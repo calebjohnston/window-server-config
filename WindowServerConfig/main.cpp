@@ -71,34 +71,57 @@ int main(int argc, const char * argv[])
 			
 			std::vector<DisplayLayout::Frame> display_frames;
 			std::vector<uint32_t> display_ids;
-//			int index = 0;
-//			for (int32_t display_datum : display_data) {
-//				DisplayLayout::Frame temp_frame;
-//				
-//				if (index % 3 == 0) {
-//					display_ids.push_back( static_cast<uint32_t>( display_datum ) );
-//				}
-//				else if (index % 2 == 0) {
-//					temp_frame.position_x = display_datum;
-//				}
-//				else {
-//					temp_frame.position_y = display_datum;
-//					display_frames.push_back( temp_frame );
-//				}
-//				
-//				index++;
-//			}
+			
+//			std::vector<int32_t> display_data;
+//			std::copy_n(display_data.begin(), 3, std::back_inserter(out));
+			int index = 0;
+			int coordinate_capture = 0;
+			DisplayLayout::Frame* temp_frame = nullptr;
+			for (int32_t display_datum : display_data) {
+				if (index % 5 == 0) {
+					display_ids.push_back( static_cast<uint32_t>( display_datum ) );
+					//std::cout << "  " << index << " / display id: " << display_datum << std::endl;
+					temp_frame = new DisplayLayout::Frame();
+				}
+				else if (coordinate_capture == 0) {
+					temp_frame->position_x = display_datum;
+					coordinate_capture++;
+				}
+				else if (coordinate_capture == 1) {
+					temp_frame->position_y = display_datum;
+					coordinate_capture++;
+				}
+				else if (coordinate_capture == 2) {
+					temp_frame->width = display_datum;
+					coordinate_capture++;
+				}
+				else if (coordinate_capture == 3) {
+					temp_frame->height = display_datum;
+					coordinate_capture = 0;
+					
+					display_frames.push_back( *temp_frame );
+					//std::cout << "  " << index << " frame: " << temp_frame->position_x << "," << temp_frame->position_y;
+					//std::cout << "  " << temp_frame->width << "x" << temp_frame->height << std::endl;
+				}
+				
+				index++;
+			}
+			
+			if (display_frames.size() != display_ids.size()) {
+				std::cerr << "Could not parse input display parameters." << std::endl;
+				return 1;
+			}
 			
 			DisplayLayout display_layout;
+			auto iter = display_frames.begin();
+			for (uint32_t device_id : display_ids) {
+				display_layout.setDesiredFrameForDisplay(device_id, *iter);
+				iter++;
+			}
 			
-//			std::string output;
-//			for (int32_t display : displays) {
-//				output += std::to_string( display );
-//				output += ",";
-//			}
-//			std::cout << output << std::endl;
+			bool success = display_layout.applyLayoutChanges();
 			
-			return 0;
+			return success? 0: 1;
 		}
 		// handle general query
 		else if (var_map.count("query")) {
