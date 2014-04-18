@@ -49,7 +49,8 @@ int main(int argc, const char * argv[])
 		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)")
 		("display,D", po::value< std::vector<int32_t> >(&display_data)->composing()->multitoken(), "Configure each display \
 		 individually. Expects a sequence of 5-tuples, each one must contain the device ID, the global x coordinate, the \
-		 global y coordinate, the canvas width, and the canvas height (in that order).");
+		 global y coordinate, the canvas width, and the canvas height (in that order). This option will cause the inputs for\
+		 columns and rows to be ignored.");
 		
 		po::variables_map var_map;
 		const po::positional_options_description position;
@@ -74,8 +75,6 @@ int main(int argc, const char * argv[])
 			std::vector<DisplayLayout::Frame> display_frames;
 			std::vector<uint32_t> display_ids;
 			
-//			std::vector<int32_t> display_data;
-//			std::copy_n(display_data.begin(), 3, std::back_inserter(out));
 			int index = 0;
 			int coordinate_capture = 0;
 			DisplayLayout::Frame* temp_frame = nullptr;
