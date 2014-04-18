@@ -33,9 +33,8 @@ int main(int argc, const char * argv[])
 	std::string rotation_str;
 	int persistence = 0;
 	
-	// displaycfg -X <id> <x,y> -X <id> <x,y>
-	
 	try {
+		// define program options...
 		po::options_description desc("Allowed options", 100);
 		desc.add_options()
 		("help,H", "produce help message")
@@ -52,6 +51,7 @@ int main(int argc, const char * argv[])
 		 global y coordinate, the canvas width, and the canvas height (in that order). This option will cause the inputs for\
 		 columns and rows to be ignored.");
 		
+		// parse program options
 		po::variables_map var_map;
 		const po::positional_options_description position;
 		po::command_line_parser parser = po::command_line_parser( argc, argv );
@@ -59,6 +59,7 @@ int main(int argc, const char * argv[])
 															 po::command_line_style::allow_slash_for_short |
 															 po::command_line_style::allow_long_disguise );
 		
+		// store inputs
 		po::store( parser.run(), var_map );
 		po::notify(var_map);
 		
@@ -108,11 +109,13 @@ int main(int argc, const char * argv[])
 				index++;
 			}
 			
+			// fail if the two lists aren't the same size
 			if (display_frames.size() != display_ids.size()) {
 				std::cerr << "Could not parse input display parameters." << std::endl;
 				return 1;
 			}
 			
+			// configure layout given inputs...
 			DisplayLayout display_layout;
 			auto iter = display_frames.begin();
 			for (uint32_t device_id : display_ids) {
@@ -205,11 +208,11 @@ int main(int argc, const char * argv[])
 			std::cout << desc << std::endl;
 		}
 	}
-	catch(std::exception& e) {
+	catch (std::exception& e) {
 		std::cerr << "Exception: " << e.what() << std::endl;
 		return 1;
 	}
-	catch(...) {
+	catch (...) {
 		return 2;
 	}
 	
