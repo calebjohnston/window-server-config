@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <iostream>
+#include <unordered_map>
 
 #include "DisplayQuery.h"
 
@@ -26,6 +27,13 @@
  */
 class DisplayLayout {
 public:
+	typedef struct frame_t {
+		uint32_t position_x;
+		uint32_t position_y;
+		uint32_t width;
+		uint32_t height;
+	} Frame;
+	
 	typedef enum orientation_t {
 		NORMAL,
 		ROTATE_90,
@@ -68,6 +76,11 @@ public:
 	//! Accessor method for the desired rotation of the current screen
 	void setDesiredOrientation(const Orientation orientation) { mOrientation = orientation; }
 	Orientation desiredOrientation() const { return mOrientation; }
+	
+	//! Assigns specific frame for the display given in the device_id parameter
+	void setDesiredFrameForDisplay(const uint32_t device_id, const Frame frame);
+	//! Returns the desired frame for the display corresponding to the device_id parameter
+	Frame getDesiredFrameForDisplay(const uint32_t device_id);
 
 	// Currently not implemented
 	//void setPrimaryDisplay(const Corner display) { mPrimary = display; }
@@ -85,6 +98,7 @@ private:
 	uint32_t mResHeight;
 	uint8_t mColumns;
 	uint8_t mRows;
+	std::unordered_map<uint32_t, Frame> mDeviceFrames;
 	Persistence mPersistence;
 	Orientation mOrientation;
 	Corner mPrimary;

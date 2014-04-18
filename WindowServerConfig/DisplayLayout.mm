@@ -27,6 +27,29 @@ DisplayLayout::~DisplayLayout()
 	}
 }
 
+void DisplayLayout::setDesiredFrameForDisplay(const uint32_t device_id, const Frame frame)
+{
+	std::unordered_map<uint32_t, Frame>::const_iterator iter = mDeviceFrames.find(device_id);
+	if (iter == mDeviceFrames.end()) {
+		mDeviceFrames.insert(std::make_pair(device_id, frame));
+	}
+	else {
+		mDeviceFrames.emplace(device_id, frame);
+	}
+}
+
+DisplayLayout::Frame DisplayLayout::getDesiredFrameForDisplay(const uint32_t device_id)
+{
+	Frame frame = {0,0,0,0};
+	std::unordered_map<uint32_t, Frame>::const_iterator iter = mDeviceFrames.find(device_id);
+	if (iter == mDeviceFrames.end()) {
+		return frame;
+	}
+	else {
+		return iter->second;
+	}
+}
+
 bool DisplayLayout::applyLayoutChanges()
 {
 	// begin configuration
@@ -46,16 +69,32 @@ bool DisplayLayout::applyLayoutChanges()
 	
 	// verify that the right display mode exist for all displays
 	bool isResolutionSupported = true;
-	//for (auto device_iter = mQuery->displays().begin(); device_iter != mQuery->displays().end(); device_iter++)
+	
+	// determine if we need to check for individually submitted display data to apply
+	const bool configureAllDisplaysIndividually = !mDeviceFrames.empty();
+	
+	// iterate through displays and apply resolution settings
 	for (const DisplayDeviceRef device : mQuery->displays())
 	{
-		//const DisplayDeviceRef& device = *device_iter;
 		uint32_t resolution_x = device->getCurrentDisplayMode()->getWidth();
 		uint32_t resolution_y = device->getCurrentDisplayMode()->getHeight();
+		
+		// if we have display frames defined for each display, then we will use that...
+		if (configureAllDisplaysIndividually) {
+			auto iter = mDeviceFrames.find(device->getDeviceId());
+			if (iter != mDeviceFrames.end()) {
+				mResWidth = iter->second.width;
+				mResHeight = iter->second.height;
+			}
+		}
+		
+		// if the resolution is set to something impossible then we don't assign it
+		// but we use the default resolution for the rest of the layout...
 		if (0 == mResWidth || 0 == mResHeight) {
 			mResWidth = resolution_x;
 			mResHeight = resolution_y;
 		}
+		// if the chosen resolution does not match the existing resolution, then we must pick the matching display mode and apply it.
 		else if (desiredResolutionWidth() != resolution_x || desiredResolutionHeight() != resolution_y)
 		{
 			isResolutionSupported = false;
@@ -89,19 +128,41 @@ bool DisplayLayout::applyLayoutChanges()
 		}
 	}
 	
-	// reposition all displays
+	// define error type for all future operations...
 	CGError result;
-	size_t count = mQuery->displays().size();
-	size_t index = 0;
-	for (uint8_t y = 0; y < desiredRows(); y++) {
-		for (uint8_t x = 0; x < desiredColumns(); x++, index++) {
-			if (x * y >= count || index >= count || !mQuery->displays().at(index)) break;
-			
-			result = CGConfigureDisplayOrigin(mConfigRef, mQuery->displays().at(index)->getDeviceId(), x * mResWidth, y * mResHeight);
-			if (kCGErrorSuccess != result) {
-				std::cerr << "Error! Could not update display position for device id: ";
-				std::cerr << mQuery->displays().at(index)->getDeviceId() << std::endl;
+	
+	// set all displays to individually assigned origins if desired
+	if (configureAllDisplaysIndividually) {
+		for (const DisplayDeviceRef device : mQuery->displays()) {
+			CGDirectDisplayID device_id = device->getDeviceId();
+			auto iter = mDeviceFrames.find(device_id);
+			if (iter != mDeviceFrames.end()) {
+				result = CGConfigureDisplayOrigin(mConfigRef, device_id, iter->second.position_x, iter->second.position_y);
+				if (kCGErrorSuccess != result) {
+					std::cerr << "Error! Could not update display position for device id: " << device_id << std::endl;
+					return false;
+				}
+			}
+			else {
+				std::cerr << "Error! Could not locate display for device id: " << device_id << std::endl;
 				return false;
+			}
+		}
+	}
+	// OR reposition all displays
+	else {
+		size_t count = mQuery->displays().size();
+		size_t index = 0;
+		for (uint8_t y = 0; y < desiredRows(); y++) {
+			for (uint8_t x = 0; x < desiredColumns(); x++, index++) {
+				if (x * y >= count || index >= count || !mQuery->displays().at(index)) break;
+				
+				result = CGConfigureDisplayOrigin(mConfigRef, mQuery->displays().at(index)->getDeviceId(), x * mResWidth, y * mResHeight);
+				if (kCGErrorSuccess != result) {
+					std::cerr << "Error! Could not update display position for device id: ";
+					std::cerr << mQuery->displays().at(index)->getDeviceId() << std::endl;
+					return false;
+				}
 			}
 		}
 	}

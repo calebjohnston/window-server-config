@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Caleb Johnston. All rights reserved.
 //
 
+#include <boost/assign/list_of.hpp>
 #include <boost/program_options.hpp>
 #include <boost/format.hpp>
 
@@ -27,9 +28,12 @@ int main(int argc, const char * argv[])
 	int desired_rows = 0;
 	double refresh_rate = 0.0;
 	int device_id = 0;
+	std::vector<int32_t> display_data;
 	std::vector<int32_t> resolution;
 	std::string rotation_str;
 	int persistence = 0;
+	
+	// displaycfg -X <id> <x,y> -X <id> <x,y>
 	
 	try {
 		po::options_description desc("Allowed options");
@@ -42,12 +46,17 @@ int main(int argc, const char * argv[])
 		("refresh,F", po::value<double>(&refresh_rate), "refresh rate")
 		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
 		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays")
-		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)");
+		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)")
+		("display,D", po::value< std::vector<int32_t> >(&display_data)->composing()->multitoken(), "Set options per display");
 		
 		po::variables_map var_map;
-		po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::unix_style
-																		  | po::command_line_style::allow_slash_for_short
-																		  | po::command_line_style::allow_long_disguise).run(), var_map);
+		const po::positional_options_description position;
+		po::command_line_parser parser = po::command_line_parser( argc, argv );
+		parser.options( desc ).positional( position ).style( po::command_line_style::unix_style |
+															 po::command_line_style::allow_slash_for_short |
+															 po::command_line_style::allow_long_disguise );
+		
+		po::store( parser.run(), var_map );
 		po::notify(var_map);
 		
 		// make regular device query...
@@ -56,6 +65,42 @@ int main(int argc, const char * argv[])
 			std::cout << desc << std::endl;
 			return 0;
 		}
+		// handle controlling display modes per screen
+		else if (var_map.count("display")) {
+			DisplayQuery query;
+			
+			std::vector<DisplayLayout::Frame> display_frames;
+			std::vector<uint32_t> display_ids;
+//			int index = 0;
+//			for (int32_t display_datum : display_data) {
+//				DisplayLayout::Frame temp_frame;
+//				
+//				if (index % 3 == 0) {
+//					display_ids.push_back( static_cast<uint32_t>( display_datum ) );
+//				}
+//				else if (index % 2 == 0) {
+//					temp_frame.position_x = display_datum;
+//				}
+//				else {
+//					temp_frame.position_y = display_datum;
+//					display_frames.push_back( temp_frame );
+//				}
+//				
+//				index++;
+//			}
+			
+			DisplayLayout display_layout;
+			
+//			std::string output;
+//			for (int32_t display : displays) {
+//				output += std::to_string( display );
+//				output += ",";
+//			}
+//			std::cout << output << std::endl;
+			
+			return 0;
+		}
+		// handle general query
 		else if (var_map.count("query")) {
 			DisplayQuery query;
 			
