@@ -36,7 +36,7 @@ int main(int argc, const char * argv[])
 	// displaycfg -X <id> <x,y> -X <id> <x,y>
 	
 	try {
-		po::options_description desc("Allowed options");
+		po::options_description desc("Allowed options", 100);
 		desc.add_options()
 		("help,H", "produce help message")
 		("query,Q", "get all connected displays")
@@ -47,7 +47,9 @@ int main(int argc, const char * argv[])
 		("columns,C", po::value<int>(&desired_cols)->default_value(1), "number of columns of displays")
 		("rows,R", po::value<int>(&desired_rows)->default_value(1), "number of rows of displays")
 		("persistence,P", po::value<int>(&persistence)->default_value(1), "configuration persistence (0=temporary, 1=permanent)")
-		("display,D", po::value< std::vector<int32_t> >(&display_data)->composing()->multitoken(), "Set options per display");
+		("display,D", po::value< std::vector<int32_t> >(&display_data)->composing()->multitoken(), "Configure each display \
+		 individually. Expects a sequence of 5-tuples, each one must contain the device ID, the global x coordinate, the \
+		 global y coordinate, the canvas width, and the canvas height (in that order).");
 		
 		po::variables_map var_map;
 		const po::positional_options_description position;
