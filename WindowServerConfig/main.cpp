@@ -123,7 +123,8 @@ int main(int argc, const char * argv[])
 				iter++;
 			}
 			
-			bool success = display_layout.applyLayoutChanges();
+//			bool success = display_layout.applyLayoutChanges();
+            bool success = display_layout.applyChanges();
 			
 			return success? 0: 1;
 		}
@@ -156,7 +157,7 @@ int main(int argc, const char * argv[])
 			}
 			
 			// print results...
-			std::cout << "There are " << device->getAllDisplayModes().size() << " display modes for " << device->displayName() << std::endl;
+			std::cout << "There are " << device->getAllDisplayModes().size() << " display modes for " << device->displayName(dev_id) << std::endl;
 			for (const DisplayModeRef mode : device->getAllDisplayModes()) {
 				output += "\t" + mode->toString();
 				output += "\n";
@@ -199,7 +200,8 @@ int main(int argc, const char * argv[])
 				display_layout.setDesiredResolution(resolution[0], resolution[1]);
 			}
 			
-			bool success = display_layout.applyLayoutChanges();
+//			bool success = display_layout.applyLayoutChanges();
+            bool success = display_layout.applyChanges();
 			
 			return success? 0: 1;
 		}

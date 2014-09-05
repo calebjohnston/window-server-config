@@ -10,10 +10,12 @@
 
 #include <CoreGraphics/CoreGraphics.h>
 #include <CoreGraphics/CGDisplayConfiguration.h>
+#import <IOKit/graphics/IOGraphicsLib.h>
 
 #include <memory>
 #include <vector>
 #include <string>
+#include <sstream>
 
 typedef std::shared_ptr<class DisplayMode> DisplayModeRef;
 typedef std::shared_ptr<class DisplayDevice> DisplayDeviceRef;
@@ -82,7 +84,75 @@ public:
 	//! Returns string representation of the display device
 	std::string toString() const;
 	//! Returns product name representing the display device
-	std::string displayName() const;
+	std::string displayName(CGDirectDisplayID displayID) const;
+    
+//    static io_service_t IOServicePortFromCGDisplayID(CGDirectDisplayID displayID);
+
+    
+    // Returns the io_service_t corresponding to a CG display ID, or 0 on failure.
+    // The io_service_t should be released with IOObjectRelease when not needed.
+    //
+    static io_service_t IOServicePortFromCGDisplayID(CGDirectDisplayID displayID)
+    {
+        std::stringstream output_str;
+        output_str << "IOServicePortFromCGDisplayID " << displayID << std::endl;
+        
+        io_iterator_t iter;
+        io_service_t serv, servicePort = 0;
+        
+        CFMutableDictionaryRef matching = IOServiceMatching("IODisplayConnect");
+        
+        // releases matching for us
+        kern_return_t err = IOServiceGetMatchingServices(kIOMasterPortDefault,
+                                                         matching,
+                                                         &iter);
+        if (err) return 0;
+        
+        while ((serv = IOIteratorNext(iter)) != 0)
+        {
+            
+            output_str << "serv:\t" << serv << std::endl;
+
+            CFDictionaryRef info;
+            CFIndex vendorID, productID;
+            CFNumberRef vendorIDRef, productIDRef;
+            Boolean success;
+            
+            info = IODisplayCreateInfoDictionary(serv, kIODisplayOnlyPreferredName);
+            
+            //const void *CFDictionaryGetValue(CFDictionaryRef theDict, const void *key);
+            
+            vendorIDRef = (CFNumberRef) CFDictionaryGetValue(info, CFSTR(kDisplayVendorID));
+            productIDRef = (CFNumberRef) CFDictionaryGetValue(info, CFSTR(kDisplayProductID));
+            
+            success = CFNumberGetValue(vendorIDRef, kCFNumberCFIndexType,
+                                       &vendorID);
+            success &= CFNumberGetValue(productIDRef, kCFNumberCFIndexType,
+                                        &productID);
+            
+            if (!success)
+            {
+                CFRelease(info);
+                continue;
+            }
+            
+            if (CGDisplayVendorNumber(displayID) != vendorID ||
+                CGDisplayModelNumber(displayID) != productID)
+            {
+                CFRelease(info);
+                continue;
+            }
+            
+            // we're a match
+            servicePort = serv;
+            CFRelease(info);
+            break;
+        }
+        
+        IOObjectRelease(iter);
+        return servicePort;
+    }
+
 	
 private:
 	CGDirectDisplayID mDeviceId;

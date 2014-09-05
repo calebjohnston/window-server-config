@@ -93,6 +93,9 @@ public:
 	//! Takes the input data and executes the configuration change
 	bool applyLayoutChanges();
 	
+    bool applyChanges();
+
+        
 private:
 	uint32_t mResWidth;
 	uint32_t mResHeight;

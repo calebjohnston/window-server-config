@@ -8,13 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <IOKit/IOKitLib.h>
-#import <IOKit/graphics/IOGraphicsLib.h>
 #import <IOKit/graphics/IOGraphicsTypes.h>
 #import <IOKit/graphics/IOGraphicsInterface.h>
 
 #import "DisplayDevice.h"
 
-#include <sstream>
 
 DisplayMode::DisplayMode(CGDisplayModeRef mode) : mModeRef( mode )
 {
@@ -122,8 +120,10 @@ DisplayDevice::~DisplayDevice()
 std::string DisplayDevice::toString() const
 {
 	std::stringstream output_str;
+    output_str << "DisplayDevice::toString" << std::endl;
 	
-	output_str << displayName() << " - " << mDeviceId << std::endl << "\t";
+    CGDirectDisplayID displayID = 0;
+	output_str << displayName(displayID) << " - " << mDeviceId << std::endl << "\t";
 	output_str << "Model Number:\t" << mModelNumber << std::endl << "\t";
 	output_str << "Serial Number:\t" << mSerialNumber << std::endl << "\t";
 	output_str << "Unit Number:\t" << mUnitNumber << std::endl << "\t";
@@ -145,9 +145,48 @@ std::string DisplayDevice::toString() const
 	return output_str.str();
 }
 
-std::string DisplayDevice::displayName() const
+
+
+
+std::string DisplayDevice::displayName(CGDirectDisplayID displayID) const
 {
-	NSString *displayProductName = nil;
+    std::stringstream output_str;
+    output_str << "DisplayDevice::displayName" << std::endl;
+    
+    char* name = nil;
+    
+    io_service_t serv = IOServicePortFromCGDisplayID(displayID);
+    if(!serv) {
+        output_str << "can't get IOServicePortFromCGDisplayID" << std::endl;
+        return name;
+    }
+
+    CFDictionaryRef info = IODisplayCreateInfoDictionary(serv, kIODisplayOnlyPreferredName);
+    
+    IOObjectRelease(serv);
+    
+    //const void *CFDictionaryGetValue(CFDictionaryRef theDict, const void *key);
+
+//    names = [info objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+    CFDictionaryRef names = (CFDictionaryRef) CFDictionaryGetValue(info, CFSTR(kDisplayProductName));
+    CFStringRef value;
+    
+    if (!names || !CFDictionaryGetValueIfPresent(names, CFSTR("en_US"), (const void**) &value)) {
+        CFRelease(info);
+        return name;
+    }
+    
+
+    CFIndex size = CFStringGetMaximumSizeForEncoding(CFStringGetLength(value), kCFStringEncodingUTF8);
+    name = (char*) calloc(size + 1, sizeof(char));
+    CFStringGetCString(value, name, size, kCFStringEncodingUTF8);
+    CFRelease(info);
+    
+    return name;
+    
+    /*
+    
+    NSString *displayProductName = nil;
 
 	// Get a CFDictionary with a key for the preferred name of the display.
 	NSDictionary *displayInfo = (NSDictionary *)IODisplayCreateInfoDictionary(CGDisplayIOServicePort(mDeviceId), kIODisplayOnlyPreferredName);
@@ -161,5 +200,6 @@ std::string DisplayDevice::displayName() const
 
 	[displayInfo release];
 	return [[displayProductName autorelease] UTF8String];
+     */
 }
 
