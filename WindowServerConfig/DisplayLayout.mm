@@ -256,26 +256,29 @@ bool DisplayLayout::applyLayoutChanges()
 	return success;
 }
 
-bool DisplayLayout::applyChanges(uint32_t indexOfDisplay) {
+bool DisplayLayout::applyChanges(uint32_t displayID) {
     
     CGError err;
     
     // Get displays
     uint32_t displayCount;
-    err = CGGetActiveDisplayList(0, 0, &displayCount);
-    if(err != kCGErrorSuccess) return false;
-    
-    // Allocate storage for the next CGGetActiveDisplayList call
-    CGDirectDisplayID* displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
-    err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
-    if(err != kCGErrorSuccess) {
-        NSLog(@"CGGetActiveDisplayList error: %d\n", err);
-        return false;
-    }
+    CGDirectDisplayID* displayIDs = nullptr;
 
-    if(indexOfDisplay != -1) {
+    if(displayID == -1) {
+        err = CGGetActiveDisplayList(0, 0, &displayCount);
+        if(err != kCGErrorSuccess) return false;
+        
+        // Allocate storage for the next CGGetActiveDisplayList call
+        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+        err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
+        if(err != kCGErrorSuccess) {
+            NSLog(@"CGGetActiveDisplayList error: %d\n", err);
+            return false;
+        }
+    } else {
         displayCount = 1;
-        displayIDs[0] = displayIDs[indexOfDisplay];
+        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+        displayIDs[0] = displayID;
     }
     
     for( int i = 0; i < displayCount; i++ ) {
