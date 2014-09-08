@@ -256,7 +256,7 @@ bool DisplayLayout::applyLayoutChanges()
 	return success;
 }
 
-bool DisplayLayout::applyChanges() {
+bool DisplayLayout::applyChanges(uint32_t indexOfDisplay) {
     
     CGError err;
     
@@ -271,6 +271,11 @@ bool DisplayLayout::applyChanges() {
     if(err != kCGErrorSuccess) {
         NSLog(@"CGGetActiveDisplayList error: %d\n", err);
         return false;
+    }
+
+    if(indexOfDisplay != -1) {
+        displayCount = 1;
+        displayIDs[0] = displayIDs[indexOfDisplay];
     }
     
     for( int i = 0; i < displayCount; i++ ) {
@@ -331,18 +336,18 @@ bool DisplayLayout::applyChanges() {
             CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, j);
             size_t width = CGDisplayModeGetWidth(mode);
             size_t height = CGDisplayModeGetHeight(mode);
-            int freq = CGDisplayModeGetRefreshRate(mode);
+//            int freq = CGDisplayModeGetRefreshRate(mode);
             
             if(mOrientation % 180) {
                 if(width < height) {
-                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height && freq == 60) {
+                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
                         desiredMode = mode;
                         break;
                     }
                 }
             } else {
                 if(width > height) {
-                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height && freq == 60) {
+                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
                         desiredMode = mode;
                         break;
                     }

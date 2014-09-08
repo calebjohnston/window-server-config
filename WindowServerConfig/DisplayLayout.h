@@ -93,7 +93,7 @@ public:
 	//! Takes the input data and executes the configuration change
 	bool applyLayoutChanges();
 	
-    bool applyChanges();
+    bool applyChanges(uint32_t display_id = -1);
 
         
 private:
