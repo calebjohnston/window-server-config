@@ -69,6 +69,38 @@ int main(int argc, const char * argv[])
 			std::cout << desc << std::endl;
 			return 0;
 		}
+
+		// handle controlling display modes for a designated screen with DisplayID
+		else if (var_map.count("display")) {
+            
+            DisplayLayout display_layout;
+            
+            // set display orientation...
+			DisplayLayout::Orientation rotation;
+			if ("90" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_90;
+			}
+			else if ("180" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_180;
+			}
+			else if ("270" == rotation_str) {
+				rotation = DisplayLayout::ROTATE_270;
+			}
+			else {
+				rotation = DisplayLayout::NORMAL;
+			}
+			display_layout.setDesiredOrientation(rotation);
+			
+			// set display resolution...
+			if (var_map.count("resolution")) {
+				display_layout.setDesiredResolution(resolution[0], resolution[1]);
+			}
+
+            bool success = display_layout.applyChanges(display_data.at(0));
+			
+			return success? 0: 1;
+		}
+ /*
 		// handle controlling display modes per screen
 		else if (var_map.count("display")) {
 			DisplayQuery query;
@@ -82,7 +114,7 @@ int main(int argc, const char * argv[])
 			for (int32_t display_datum : display_data) {
 				if (index % 5 == 0) {
 					display_ids.push_back( static_cast<uint32_t>( display_datum ) );
-					//std::cout << "  " << index << " / display id: " << display_datum << std::endl;
+                    //std::cout << "  " << index << " / display id: " << display_datum << std::endl;
 					temp_frame = new DisplayLayout::Frame();
 				}
 				else if (coordinate_capture == 0) {
@@ -108,7 +140,7 @@ int main(int argc, const char * argv[])
 				
 				index++;
 			}
-			
+            
 			// fail if the two lists aren't the same size
 			if (display_frames.size() != display_ids.size()) {
 				std::cerr << "Could not parse input display parameters." << std::endl;
@@ -122,11 +154,13 @@ int main(int argc, const char * argv[])
 				display_layout.setDesiredFrameForDisplay(device_id, *iter);
 				iter++;
 			}
-			
-			bool success = display_layout.applyLayoutChanges();
+            
+//			bool success = display_layout.applyLayoutChanges();
+            bool success = display_layout.applyChanges();
 			
 			return success? 0: 1;
 		}
+*/
 		// handle general query
 		else if (var_map.count("query")) {
 			DisplayQuery query;
@@ -156,7 +190,7 @@ int main(int argc, const char * argv[])
 			}
 			
 			// print results...
-			std::cout << "There are " << device->getAllDisplayModes().size() << " display modes for " << device->displayName() << std::endl;
+			std::cout << "There are " << device->getAllDisplayModes().size() << " display modes for " << device->displayName(dev_id) << std::endl;
 			for (const DisplayModeRef mode : device->getAllDisplayModes()) {
 				output += "\t" + mode->toString();
 				output += "\n";
@@ -198,10 +232,11 @@ int main(int argc, const char * argv[])
 			if (var_map.count("resolution")) {
 				display_layout.setDesiredResolution(resolution[0], resolution[1]);
 			}
+						
+//			bool success = display_layout.applyLayoutChanges();
+            bool success = display_layout.applyChanges();
 			
-			bool success = display_layout.applyLayoutChanges();
-			
-			return success? 0: 1;
+			return success? 0 : 1;
 		}
 		else {
 			std::cout << "Usage: " << argv[0] << " [options]" << std::endl;

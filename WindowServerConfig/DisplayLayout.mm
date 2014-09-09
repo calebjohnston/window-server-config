@@ -15,6 +15,30 @@
 
 #include "DisplayLayout.h"
 
+// CoreGraphics DisplayMode struct used in private APIs
+typedef struct
+{
+    uint32_t modeNumber;
+    uint32_t flags;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint8_t unknown[170];
+    uint16_t freq;
+    uint8_t more_unknown[16];
+    float density;
+}
+CGSDisplayMode;
+
+extern "C"
+{
+    void CGSGetCurrentDisplayMode(CGDirectDisplayID display, int *modeNum);
+    void CGSConfigureDisplayMode(CGDisplayConfigRef config, CGDirectDisplayID display, int modeNum);
+    void CGSGetNumberOfDisplayModes(CGDirectDisplayID display, int *nModes);
+    void CGSGetDisplayModeDescriptionOfLength(CGDirectDisplayID display, int idx, CGSDisplayMode *mode, int length);
+};
+
+
 DisplayLayout::DisplayLayout()
  :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mPersistence(PERMANENT)
 {
@@ -191,15 +215,15 @@ bool DisplayLayout::applyLayoutChanges()
 			case NORMAL:
 				options = (0x00000400 | (kIOScaleRotate0)  << 16);
 				break;
-
+                
 			case ROTATE_90:
 				options = (0x00000400 | (kIOScaleRotate90)  << 16);
 				break;
-
+                
 			case ROTATE_180:
 				options = (0x00000400 | (kIOScaleRotate180)  << 16);
 				break;
-
+                
 			case ROTATE_270:
 				options = (0x00000400 | (kIOScaleRotate270)  << 16);
 				break;
@@ -211,14 +235,14 @@ bool DisplayLayout::applyLayoutChanges()
 		}
 		
 		/*
-		io_service_t service = CGDisplayIOServicePort(mQuery->displays().front()->getDeviceId());
-		task_port_t owningTask;
-		unsigned int type;
-		io_connect_t connect;
-		kern_return_t kern_id = IOFramebufferOpen( service, owningTask, type, &connect );
-		IOPixelAperture aperture;
-		IOFramebufferInformation info;
-		kern_return_t IOFBGetFramebufferInformationForAperture( connect, aperture, &info );
+         io_service_t service = CGDisplayIOServicePort(mQuery->displays().front()->getDeviceId());
+         task_port_t owningTask;
+         unsigned int type;
+         io_connect_t connect;
+         kern_return_t kern_id = IOFramebufferOpen( service, owningTask, type, &connect );
+         IOPixelAperture aperture;
+         IOFramebufferInformation info;
+         kern_return_t IOFBGetFramebufferInformationForAperture( connect, aperture, &info );
 		 */
 		
 		mConfigRef = nullptr;
@@ -232,3 +256,130 @@ bool DisplayLayout::applyLayoutChanges()
 	return success;
 }
 
+bool DisplayLayout::applyChanges(uint32_t displayID) {
+    
+    CGError err;
+    
+    // Get displays
+    uint32_t displayCount;
+    CGDirectDisplayID* displayIDs = nullptr;
+
+    if(displayID == -1) {
+        err = CGGetActiveDisplayList(0, 0, &displayCount);
+        if(err != kCGErrorSuccess) return false;
+        
+        // Allocate storage for the next CGGetActiveDisplayList call
+        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+        err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
+        if(err != kCGErrorSuccess) {
+            NSLog(@"CGGetActiveDisplayList error: %d\n", err);
+            return false;
+        }
+    } else {
+        displayCount = 1;
+        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+        displayIDs[0] = displayID;
+    }
+    
+    for( int i = 0; i < displayCount; i++ ) {
+        
+        if(CGDisplayRotation(displayIDs[i]) != mOrientation) {
+            
+            io_service_t service = CGDisplayIOServicePort(displayIDs[i]);
+            IOOptionBits options;
+            switch (mOrientation) {
+                case NORMAL:
+                    options = (0x00000400 | (kIOScaleRotate0)  << 16);
+                    break;
+                    
+                case ROTATE_90:
+                    options = (0x00000400 | (kIOScaleRotate90)  << 16);
+                    break;
+                    
+                case ROTATE_180:
+                    options = (0x00000400 | (kIOScaleRotate180)  << 16);
+                    break;
+                    
+                case ROTATE_270:
+                    options = (0x00000400 | (kIOScaleRotate270)  << 16);
+                    break;
+            }
+            
+            err = IOServiceRequestProbe(service, options);
+            if(err != kCGErrorSuccess) {
+                NSLog(@"IOServiceRequestProbe -- DisplayID: %d\terror: %d \n\n\n", displayIDs[i], err);
+                return false;
+            }
+            
+            // Need to pause for a bit for the CG system to catch up
+            sleep(3);
+        }
+    }
+    
+    int i = 0;
+    do {
+        CGDisplayConfigRef config;
+        err = CGBeginDisplayConfiguration(&config);
+        if(err != kCGErrorSuccess) {
+            NSLog(@"CGBeginDisplayConfiguration(%d) error: %d\n", displayIDs[i], err);
+            continue;
+        }
+        
+        if (0 == mResWidth || 0 == mResHeight) continue;
+        
+        CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(displayIDs[i], 0);
+        if(!displayModes) {
+            NSLog(@"CGDisplayCopyAllDisplayModes not found\n");
+            continue;
+        }
+        
+        CGDisplayModeRef desiredMode = nil;
+        for(int j=0, n = (int) CFArrayGetCount(displayModes); j<n; j++) {
+        
+            CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, j);
+            size_t width = CGDisplayModeGetWidth(mode);
+            size_t height = CGDisplayModeGetHeight(mode);
+//            int freq = CGDisplayModeGetRefreshRate(mode);
+            
+            if(mOrientation % 180) {
+                if(width < height) {
+                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
+                        desiredMode = mode;
+                        break;
+                    }
+                }
+            } else {
+                if(width > height) {
+                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
+                        desiredMode = mode;
+                        break;
+                    }
+                }
+            }
+        }
+        CFRelease(displayModes);
+        
+        if(desiredMode == nil) {
+            NSLog(@"%d x %d not found\n\n\n", desiredResolutionWidth(), desiredResolutionHeight());
+            continue;
+        }
+        
+        err = CGConfigureDisplayWithDisplayMode(config, displayIDs[i], desiredMode, 0);
+        if(err != kCGErrorSuccess) {
+            NSLog(@"CGConfigureDisplayWithDisplayMode(%d) error: %d\n", displayIDs[i], err);
+            continue;
+        }
+        
+        err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
+        if(err != kCGErrorSuccess) {
+            NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
+            continue;
+        }
+    } while(i++, i < displayCount);
+    
+    CGReleaseAllDisplays();
+	   
+    if(err != kCGErrorSuccess) return false;
+    
+    return true;
+}
