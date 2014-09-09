@@ -40,7 +40,7 @@ extern "C"
 
 
 DisplayLayout::DisplayLayout()
- :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mPersistence(PERMANENT)
+ :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mPersistence(PERMANENT), mConfigRef(nullptr)
 {
 }
 
