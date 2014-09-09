@@ -275,6 +275,10 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
             NSLog(@"CGGetActiveDisplayList error: %d\n", err);
             return false;
         }
+        
+        if( displayCount != mRows * mColumns ) {
+            NSLog(@"Look! The number of Rows * Columns are not matched with the number of displays.\n");
+        }
     } else {
         displayCount = 1;
         displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
@@ -315,6 +319,9 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
             sleep(3);
         }
     }
+    
+    int mainDisplayWidth = 0;
+    int mainDisplayHeight = 0;
     
     int i = 0;
     do {
@@ -370,6 +377,21 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
             continue;
         }
         
+        if( i == 0 ) { // main display
+            mainDisplayWidth = desiredResolutionWidth();
+            mainDisplayHeight = desiredResolutionHeight();
+        }
+        
+        if( mRows > 1 || mColumns > 1 ) {
+            int col = i % mColumns;
+            int row = i / mColumns;
+            err = CGConfigureDisplayOrigin(config, displayIDs[i], mainDisplayWidth * col, mainDisplayHeight * row);
+            if(err != kCGErrorSuccess) {
+                NSLog(@"CGConfigureDisplayOrigin error: %d\n", err);
+                continue;
+            }
+        }
+
         err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
         if(err != kCGErrorSuccess) {
             NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
