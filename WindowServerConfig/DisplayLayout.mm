@@ -263,39 +263,45 @@ bool operator<( const DisplayLayout::Frame& a, const DisplayLayout::Frame& b ){
     return false;
 }
 
-bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_frames) {
+bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
     
     CGError err;
     
     // Get displays
     
-    std::vector<DisplayLayout::Frame> displays;
+    std::vector<Frame> displays;
+
+    uint32_t displayCount;
+    err = CGGetActiveDisplayList(0, 0, &displayCount);
+    if(err != kCGErrorSuccess) return false;
+
+    CGDirectDisplayID* displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+    err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
+    if(err != kCGErrorSuccess) {
+        NSLog(@"CGGetActiveDisplayList error: %d\n", err);
+        return false;
+    }
+
+//    if( displayCount != mRows * mColumns ) {
+//        NSLog(@"Look! The number of Rows * Columns are not matched with the number of displays.\n");
+//    }
 
     if(display_frames.size() != 0) {
-        
+
+        for( std::vector<Frame>::iterator iter = display_frames.begin(); iter != display_frames.end(); ++iter ) {
+            for( int i = 0; i < displayCount; i++) {
+                if( CGDisplaySerialNumber(displayIDs[i]) == iter->serialNumber )
+                    iter->displayID = displayIDs[i];
+            }
+        }
         displays = display_frames;
         
     } else {
         
-        uint32_t displayCount;
-        err = CGGetActiveDisplayList(0, 0, &displayCount);
-        if(err != kCGErrorSuccess) return false;
-        
-        // Allocate storage for the next CGGetActiveDisplayList call
-        CGDirectDisplayID* displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
-        err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
-        if(err != kCGErrorSuccess) {
-            NSLog(@"CGGetActiveDisplayList error: %d\n", err);
-            return false;
-        }
-        
-        if( displayCount != mRows * mColumns ) {
-            NSLog(@"Look! The number of Rows * Columns are not matched with the number of displays.\n");
-        }
-        
         for( int i = 0; i < displayCount; i++ ) {
-            DisplayLayout::Frame* frame = new DisplayLayout::Frame();
+            Frame* frame = new Frame();
             frame->displayID = displayIDs[i];
+            frame->serialNumber = CGDisplaySerialNumber(displayIDs[i]);
             frame->position_x = -1;
             frame->position_y = -1;
             frame->width = mResWidth;
@@ -308,7 +314,7 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
     std::sort(displays.begin(), displays.end());
     
     // set display mode
-    for( std::vector<DisplayLayout::Frame>::iterator iter = displays.begin(); iter != displays.end(); ++iter ) {
+    for( std::vector<Frame>::iterator iter = displays.begin(); iter != displays.end(); ++iter ) {
         
         CGDirectDisplayID displayID = (*iter).displayID;
         if( CGDisplayRotation(displayID) != mOrientation ) {
@@ -346,8 +352,15 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
     
     int mainDisplayWidth = 0;
     int mainDisplayHeight = 0;
+
+    CGDisplayConfigRef config;
+    err = CGBeginDisplayConfiguration(&config);
+    if(err != kCGErrorSuccess) {
+        NSLog(@"CGBeginDisplayConfiguration error: %d\n", err);
+        return false;
+    }
     
-    std::vector<DisplayLayout::Frame>::iterator display = displays.begin();
+    std::vector<Frame>::iterator display = displays.begin();
     do {
         
         CGDirectDisplayID displayID = (*display).displayID;
@@ -358,13 +371,6 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
         int index = (int)( display - displays.begin() );
         
         if( ( mResWidth == 0 && targetX == -1 ) || ( mResHeight ==0 && targetY == -1 ) ) continue;
-        
-        CGDisplayConfigRef config;
-        err = CGBeginDisplayConfiguration(&config);
-        if(err != kCGErrorSuccess) {
-            NSLog(@"CGBeginDisplayConfiguration(%d) error: %d\n", displayID, err);
-            continue;
-        }
         
         CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(displayID, 0);
         if(!displayModes) {
@@ -417,14 +423,14 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
                 continue;
             }
         }
-        
-        err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
-        if(err != kCGErrorSuccess) {
-            NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
-            continue;
-        }
-                
+
     } while( ++display, display != displays.end() );
+
+    err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
+    if(err != kCGErrorSuccess) {
+        NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
+        return false;
+    }
     
     CGReleaseAllDisplays();
 	   
