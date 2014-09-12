@@ -155,7 +155,7 @@ int main(int argc, const char * argv[])
                 std::vector<uint32_t> display_ids;
                 for(std::vector<int32_t>::iterator iter = display_data.begin(); iter != display_data.end(); ++iter) {
                     DisplayLayout::Frame* frame = new DisplayLayout::Frame();
-                    frame->displayID = *iter++;
+                    frame->serialNumber = *iter++;
                     frame->position_x = *iter++;
                     frame->position_y = *iter++;
                     frame->width = *iter++;

@@ -29,6 +29,7 @@ class DisplayLayout {
 public:
 	typedef struct frame_t {
         uint32_t displayID;
+        uint32_t serialNumber;
 		uint32_t position_x;
 		uint32_t position_y;
 		uint32_t width;
@@ -94,7 +95,7 @@ public:
 	//! Takes the input data and executes the configuration change
 	bool applyLayoutChanges();
 	
-    bool applyChanges(std::vector<DisplayLayout::Frame> &display_frames);
+    bool applyChanges(std::vector<Frame> &display_frames);
 
         
 private:
