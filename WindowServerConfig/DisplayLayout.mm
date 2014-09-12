@@ -256,20 +256,33 @@ bool DisplayLayout::applyLayoutChanges()
 	return success;
 }
 
-bool DisplayLayout::applyChanges(uint32_t displayID) {
+
+bool operator<( const DisplayLayout::Frame& a, const DisplayLayout::Frame& b ){
+    if ( a.position_x < b.position_x ) return true;
+    else if ( a.position_x == b.position_x && a.position_y < b.position_y ) return true;
+    return false;
+}
+
+bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_frames) {
     
     CGError err;
     
     // Get displays
-    uint32_t displayCount;
-    CGDirectDisplayID* displayIDs = nullptr;
+    
+    std::vector<DisplayLayout::Frame> displays;
 
-    if(displayID == -1) {
+    if(display_frames.size() != 0) {
+        
+        displays = display_frames;
+        
+    } else {
+        
+        uint32_t displayCount;
         err = CGGetActiveDisplayList(0, 0, &displayCount);
         if(err != kCGErrorSuccess) return false;
         
         // Allocate storage for the next CGGetActiveDisplayList call
-        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
+        CGDirectDisplayID* displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
         err = CGGetActiveDisplayList(displayCount, displayIDs, &displayCount);
         if(err != kCGErrorSuccess) {
             NSLog(@"CGGetActiveDisplayList error: %d\n", err);
@@ -279,17 +292,28 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
         if( displayCount != mRows * mColumns ) {
             NSLog(@"Look! The number of Rows * Columns are not matched with the number of displays.\n");
         }
-    } else {
-        displayCount = 1;
-        displayIDs = (CGDirectDisplayID*) malloc(displayCount * sizeof(CGDirectDisplayID));
-        displayIDs[0] = displayID;
+        
+        for( int i = 0; i < displayCount; i++ ) {
+            DisplayLayout::Frame* frame = new DisplayLayout::Frame();
+            frame->displayID = displayIDs[i];
+            frame->position_x = -1;
+            frame->position_y = -1;
+            frame->width = mResWidth;
+            frame->height = mResHeight;
+            displays.push_back( *frame );
+        }
     }
     
-    for( int i = 0; i < displayCount; i++ ) {
+    // sort displays by position
+    std::sort(displays.begin(), displays.end());
+    
+    // set display mode
+    for( std::vector<DisplayLayout::Frame>::iterator iter = displays.begin(); iter != displays.end(); ++iter ) {
         
-        if(CGDisplayRotation(displayIDs[i]) != mOrientation) {
+        CGDirectDisplayID displayID = (*iter).displayID;
+        if( CGDisplayRotation(displayID) != mOrientation ) {
             
-            io_service_t service = CGDisplayIOServicePort(displayIDs[i]);
+            io_service_t service = CGDisplayIOServicePort(displayID);
             IOOptionBits options;
             switch (mOrientation) {
                 case NORMAL:
@@ -311,7 +335,7 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
             
             err = IOServiceRequestProbe(service, options);
             if(err != kCGErrorSuccess) {
-                NSLog(@"IOServiceRequestProbe -- DisplayID: %d\terror: %d \n\n\n", displayIDs[i], err);
+                NSLog(@"IOServiceRequestProbe -- DisplayID: %d\terror: %d \n\n\n", displayID, err);
                 return false;
             }
             
@@ -323,18 +347,26 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
     int mainDisplayWidth = 0;
     int mainDisplayHeight = 0;
     
-    int i = 0;
+    std::vector<DisplayLayout::Frame>::iterator display = displays.begin();
     do {
+        
+        CGDirectDisplayID displayID = (*display).displayID;
+        uint32_t targetWidth = (*display).width;
+        uint32_t targetHeight = (*display).height;
+        uint32_t targetX = (*display).position_x;
+        uint32_t targetY = (*display).position_y;
+        int index = (int)( display - displays.begin() );
+        
+        if( ( mResWidth == 0 && targetX == -1 ) || ( mResHeight ==0 && targetY == -1 ) ) continue;
+        
         CGDisplayConfigRef config;
         err = CGBeginDisplayConfiguration(&config);
         if(err != kCGErrorSuccess) {
-            NSLog(@"CGBeginDisplayConfiguration(%d) error: %d\n", displayIDs[i], err);
+            NSLog(@"CGBeginDisplayConfiguration(%d) error: %d\n", displayID, err);
             continue;
         }
         
-        if (0 == mResWidth || 0 == mResHeight) continue;
-        
-        CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(displayIDs[i], 0);
+        CFArrayRef displayModes = CGDisplayCopyAllDisplayModes(displayID, 0);
         if(!displayModes) {
             NSLog(@"CGDisplayCopyAllDisplayModes not found\n");
             continue;
@@ -347,57 +379,52 @@ bool DisplayLayout::applyChanges(uint32_t displayID) {
             size_t width = CGDisplayModeGetWidth(mode);
             size_t height = CGDisplayModeGetHeight(mode);
 //            int freq = CGDisplayModeGetRefreshRate(mode);
-            
-            if(mOrientation % 180) {
-                if(width < height) {
-                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
-                        desiredMode = mode;
-                        break;
-                    }
-                }
-            } else {
-                if(width > height) {
-                    if(desiredResolutionWidth() == width && desiredResolutionHeight() == height /*&& freq == 60*/) {
-                        desiredMode = mode;
-                        break;
-                    }
-                }
+
+            if( (mOrientation % 180 != 0 && width > height) || (mOrientation % 180 == 0 && width < height) ) break;
+
+            // todo: check the freq
+            if(targetWidth == width && targetHeight == height ) { //&& freq == 60) {
+                desiredMode = mode;
+                break;
             }
         }
         CFRelease(displayModes);
         
         if(desiredMode == nil) {
-            NSLog(@"%d x %d not found\n\n\n", desiredResolutionWidth(), desiredResolutionHeight());
+            NSLog(@"%d x %d not found\n", targetWidth, targetHeight);
             continue;
         }
         
-        err = CGConfigureDisplayWithDisplayMode(config, displayIDs[i], desiredMode, 0);
+        err = CGConfigureDisplayWithDisplayMode(config, displayID, desiredMode, 0);
         if(err != kCGErrorSuccess) {
-            NSLog(@"CGConfigureDisplayWithDisplayMode(%d) error: %d\n", displayIDs[i], err);
+            NSLog(@"CGConfigureDisplayWithDisplayMode(%d) error: %d\n", displayID, err);
             continue;
         }
         
-        if( i == 0 ) { // main display
+        if( index == 0 ) { // main display
             mainDisplayWidth = desiredResolutionWidth();
             mainDisplayHeight = desiredResolutionHeight();
         }
         
         if( mRows > 1 || mColumns > 1 ) {
-            int col = i % mColumns;
-            int row = i / mColumns;
-            err = CGConfigureDisplayOrigin(config, displayIDs[i], mainDisplayWidth * col, mainDisplayHeight * row);
+            if( targetX != -1 && targetY != -1 )
+                err = CGConfigureDisplayOrigin(config, displayID, targetX, targetY);
+            else
+                err = CGConfigureDisplayOrigin(config, displayID, mainDisplayWidth * ( index % mColumns ), mainDisplayHeight * ( index / mColumns ));
+            
             if(err != kCGErrorSuccess) {
                 NSLog(@"CGConfigureDisplayOrigin error: %d\n", err);
                 continue;
             }
         }
-
+        
         err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
         if(err != kCGErrorSuccess) {
             NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
             continue;
         }
-    } while(i++, i < displayCount);
+                
+    } while( ++display, display != displays.end() );
     
     CGReleaseAllDisplays();
 	   

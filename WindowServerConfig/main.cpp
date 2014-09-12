@@ -69,99 +69,8 @@ int main(int argc, const char * argv[])
 			std::cout << desc << std::endl;
 			return 0;
 		}
-
-		// handle controlling display modes for a designated screen with DisplayID
-		else if (var_map.count("display")) {
-            
-            DisplayLayout display_layout;
-            
-            // set display orientation...
-			DisplayLayout::Orientation rotation;
-			if ("90" == rotation_str) {
-				rotation = DisplayLayout::ROTATE_90;
-			}
-			else if ("180" == rotation_str) {
-				rotation = DisplayLayout::ROTATE_180;
-			}
-			else if ("270" == rotation_str) {
-				rotation = DisplayLayout::ROTATE_270;
-			}
-			else {
-				rotation = DisplayLayout::NORMAL;
-			}
-			display_layout.setDesiredOrientation(rotation);
-			
-			// set display resolution...
-			if (var_map.count("resolution")) {
-				display_layout.setDesiredResolution(resolution[0], resolution[1]);
-			}
-
-            bool success = display_layout.applyChanges(display_data.at(0));
-			
-			return success? 0: 1;
-		}
- /*
-		// handle controlling display modes per screen
-		else if (var_map.count("display")) {
-			DisplayQuery query;
-			
-			std::vector<DisplayLayout::Frame> display_frames;
-			std::vector<uint32_t> display_ids;
-			
-			int index = 0;
-			int coordinate_capture = 0;
-			DisplayLayout::Frame* temp_frame = nullptr;
-			for (int32_t display_datum : display_data) {
-				if (index % 5 == 0) {
-					display_ids.push_back( static_cast<uint32_t>( display_datum ) );
-                    //std::cout << "  " << index << " / display id: " << display_datum << std::endl;
-					temp_frame = new DisplayLayout::Frame();
-				}
-				else if (coordinate_capture == 0) {
-					temp_frame->position_x = display_datum;
-					coordinate_capture++;
-				}
-				else if (coordinate_capture == 1) {
-					temp_frame->position_y = display_datum;
-					coordinate_capture++;
-				}
-				else if (coordinate_capture == 2) {
-					temp_frame->width = display_datum;
-					coordinate_capture++;
-				}
-				else if (coordinate_capture == 3) {
-					temp_frame->height = display_datum;
-					coordinate_capture = 0;
-					
-					display_frames.push_back( *temp_frame );
-					//std::cout << "  " << index << " frame: " << temp_frame->position_x << "," << temp_frame->position_y;
-					//std::cout << "  " << temp_frame->width << "x" << temp_frame->height << std::endl;
-				}
-				
-				index++;
-			}
-            
-			// fail if the two lists aren't the same size
-			if (display_frames.size() != display_ids.size()) {
-				std::cerr << "Could not parse input display parameters." << std::endl;
-				return 1;
-			}
-			
-			// configure layout given inputs...
-			DisplayLayout display_layout;
-			auto iter = display_frames.begin();
-			for (uint32_t device_id : display_ids) {
-				display_layout.setDesiredFrameForDisplay(device_id, *iter);
-				iter++;
-			}
-            
-//			bool success = display_layout.applyLayoutChanges();
-            bool success = display_layout.applyChanges();
-			
-			return success? 0: 1;
-		}
-*/
-		// handle general query
+        
+        // handle general query
 		else if (var_map.count("query")) {
 			DisplayQuery query;
 			
@@ -174,8 +83,8 @@ int main(int argc, const char * argv[])
 			
 			return 0;
 		}
-		
-		// make device query for all display modes using given device ID
+        
+        // make device query for all display modes using given device ID
 		else if (var_map.count("modes")) {
 			DisplayQuery query;
 			
@@ -199,7 +108,9 @@ int main(int argc, const char * argv[])
 			
 			return 0;
 		}
+        
 		else if (argc > 1) {
+            
 			DisplayLayout display_layout;
 			
 			// set display arrangement persistence
@@ -207,20 +118,22 @@ int main(int argc, const char * argv[])
 				persistence += 1;
 			}
 			display_layout.setPersistence(static_cast<DisplayLayout::Persistence>(persistence));
-			
+            
+            
 			// set display wall dimensions...
 			if (desired_rows > 0) display_layout.setDesiredRows(desired_rows);
 			if (desired_cols > 0) display_layout.setDesiredColumns(desired_cols);
 			
+             
 			// set display orientation... 
 			DisplayLayout::Orientation rotation;
-			if ("90" == rotation_str) {
+			if (!rotation_str.compare("90")) {
 				rotation = DisplayLayout::ROTATE_90;
 			}
-			else if ("180" == rotation_str) {
+			else if (!rotation_str.compare("180")) {
 				rotation = DisplayLayout::ROTATE_180;
 			}
-			else if ("270" == rotation_str) {
+			else if (!rotation_str.compare("270")) {
 				rotation = DisplayLayout::ROTATE_270;
 			}
 			else {
@@ -228,15 +141,30 @@ int main(int argc, const char * argv[])
 			}
 			display_layout.setDesiredOrientation(rotation);
 			
+            
 			// set display resolution...
 			if (var_map.count("resolution")) {
-				display_layout.setDesiredResolution(resolution[0], resolution[1]);
+				display_layout.setDesiredResolution(resolution.at(0), resolution.at(1));
 			}
-						
-//			bool success = display_layout.applyLayoutChanges();
-            bool success = display_layout.applyChanges();
-			
-			return success? 0 : 1;
+            
+            
+            // --display position and resolution with display ID
+            std::vector<DisplayLayout::Frame> display_frames;
+            if (var_map.count("display")) {
+                
+                std::vector<uint32_t> display_ids;
+                for(std::vector<int32_t>::iterator iter = display_data.begin(); iter != display_data.end(); ++iter) {
+                    DisplayLayout::Frame* frame = new DisplayLayout::Frame();
+                    frame->displayID = *iter++;
+                    frame->position_x = *iter++;
+                    frame->position_y = *iter++;
+                    frame->width = *iter++;
+                    frame->height = *iter;
+                    display_frames.push_back( *frame );
+                }
+            }
+            
+			return display_layout.applyChanges(display_frames);
 		}
 		else {
 			std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
@@ -253,4 +181,3 @@ int main(int argc, const char * argv[])
 	
     return 0;
 }
-
