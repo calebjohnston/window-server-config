@@ -67,6 +67,10 @@ public:
 	uint32_t desiredResolutionWidth() const { return mResWidth; }
 	uint32_t desiredResolutionHeight() const { return mResHeight; }
 	
+    //! Accessor method for the desired frequency
+    void setDesiredFrequency(const uint32_t freq) { mFreq = freq; }
+    uint32_t desiredFrequency() const { return mFreq; }
+    
 	//! Accessor method for the desired number of columns in a display wall
 	void setDesiredColumns(const uint8_t width) { mColumns = width; }
 	uint8_t desiredColumns() const { return mColumns; }
@@ -102,6 +106,7 @@ private:
     
 	uint32_t mResWidth;
 	uint32_t mResHeight;
+    uint32_t mFreq;
 	uint8_t mColumns;
 	uint8_t mRows;
 	std::unordered_map<uint32_t, Frame> mDeviceFrames;
