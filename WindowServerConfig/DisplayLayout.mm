@@ -40,7 +40,7 @@ extern "C"
 
 
 DisplayLayout::DisplayLayout()
- :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mPersistence(PERMANENT)
+ :	mOrientation(NORMAL), mPrimary(UPPER_LEFT), mColumns(1), mRows(1), mResWidth(0), mResHeight(0), mFreq(60), mPersistence(PERMANENT)
 {
 }
 
@@ -264,7 +264,7 @@ bool operator<( const DisplayLayout::Frame& a, const DisplayLayout::Frame& b ){
 }
 
 bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
-    
+
     CGError err;
     
     // Get displays
@@ -359,7 +359,7 @@ bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
         NSLog(@"CGBeginDisplayConfiguration error: %d\n", err);
         return false;
     }
-    
+
     std::vector<Frame>::iterator display = displays.begin();
     do {
         
@@ -377,23 +377,31 @@ bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
             NSLog(@"CGDisplayCopyAllDisplayModes not found\n");
             continue;
         }
-        
+ 
         CGDisplayModeRef desiredMode = nil;
-        for(int j=0, n = (int) CFArrayGetCount(displayModes); j<n; j++) {
-        
+        int display_count = (int) CFArrayGetCount(displayModes);
+        for(int j=0, n = display_count; j<n; j++) {
+            
             CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, j);
             size_t width = CGDisplayModeGetWidth(mode);
             size_t height = CGDisplayModeGetHeight(mode);
-//            int freq = CGDisplayModeGetRefreshRate(mode);
-
-            if( (mOrientation % 180 != 0 && width > height) || (mOrientation % 180 == 0 && width < height) ) break;
+            int freq = CGDisplayModeGetRefreshRate(mode);
+            
+//            CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding(mode);
+//            NSLog(@"Display mode pixel encoding: %@", pixelEncoding);
+            
+            bool bUsableForDesktopGui = CGDisplayModeIsUsableForDesktopGUI(mode);
+            if(!bUsableForDesktopGui) continue;
+            
+            if( (mOrientation % 180 != 0 && width > height) || (mOrientation % 180 == 0 && width < height) ) continue;
 
             // todo: check the freq
-            if(targetWidth == width && targetHeight == height ) { //&& freq == 60) {
+            if(targetWidth == width && targetHeight == height && freq == mFreq) {
                 desiredMode = mode;
                 break;
             }
         }
+        
         CFRelease(displayModes);
         
         if(desiredMode == nil) {
@@ -423,7 +431,7 @@ bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
                 continue;
             }
         }
-
+        
     } while( ++display, display != displays.end() );
 
     err = CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
@@ -431,7 +439,7 @@ bool DisplayLayout::applyChanges(std::vector<Frame> &display_frames) {
         NSLog(@"CGCompleteDisplayConfiguration error: %d\n", err);
         return false;
     }
-    
+
     CGReleaseAllDisplays();
 	   
     if(err != kCGErrorSuccess) return false;
