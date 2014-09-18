@@ -12,22 +12,34 @@
 	<dict>
 		<key>19CFB676-3D32-496C-8C08-0C8D024C102B</key>
 		<string>ssh://github.com/calebjohnston/window-server-config.git</string>
+		<key>B46F4ABEA5E49A60919710D68BBDB12FCA11690C</key>
+		<string>https://github.com/jihyunlee/window-server-config.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>WindowServerConfig.xcodeproj/project.xcworkspace</string>
+	<string>WindowServerConfig.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>19CFB676-3D32-496C-8C08-0C8D024C102B</key>
+		<string>../../../WindowServerConfig</string>
+		<key>B46F4ABEA5E49A60919710D68BBDB12FCA11690C</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/calebjohnston/window-server-config.git</string>
+	<string>https://github.com/jihyunlee/window-server-config.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>19CFB676-3D32-496C-8C08-0C8D024C102B</string>
+	<string>B46F4ABEA5E49A60919710D68BBDB12FCA11690C</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B46F4ABEA5E49A60919710D68BBDB12FCA11690C</string>
+			<key>IDESourceControlWCCName</key>
+			<string>window-server-config</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
