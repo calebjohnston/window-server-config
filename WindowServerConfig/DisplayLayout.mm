@@ -378,12 +378,16 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
             CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, j);
             size_t width = CGDisplayModeGetWidth(mode);
             size_t height = CGDisplayModeGetHeight(mode);
+			bool acceptable = CGDisplayModeIsUsableForDesktopGUI(mode);
+			if (!acceptable) {
+				NSLog(@"Display mode is not acceptable for desktop");
+			}
 //            int freq = CGDisplayModeGetRefreshRate(mode);
 
             if( (mOrientation % 180 != 0 && width > height) || (mOrientation % 180 == 0 && width < height) ) break;
 
             // todo: check the freq
-            if(targetWidth == width && targetHeight == height ) { //&& freq == 60) {
+            if(targetWidth == width && targetHeight == height && acceptable) { //&& freq == 60) {
                 desiredMode = mode;
                 break;
             }
