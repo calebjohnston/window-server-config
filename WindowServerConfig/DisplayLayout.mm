@@ -378,6 +378,8 @@ bool DisplayLayout::applyChanges(std::vector<DisplayLayout::Frame> &display_fram
             CGDisplayModeRef mode = (CGDisplayModeRef) CFArrayGetValueAtIndex(displayModes, j);
             size_t width = CGDisplayModeGetWidth(mode);
             size_t height = CGDisplayModeGetHeight(mode);
+			CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding(mode);
+			NSLog(@"Display mode pixel encoding: %@", pixelEncoding);
 			bool acceptable = CGDisplayModeIsUsableForDesktopGUI(mode);
 			if (!acceptable) {
 				NSLog(@"Display mode is not acceptable for desktop");
