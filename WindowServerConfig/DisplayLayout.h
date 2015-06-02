@@ -30,6 +30,7 @@ public:
 	typedef struct frame_t {
         uint32_t displayID;
         uint32_t serialNumber;
+		uint32_t unitNumber;
 		uint32_t position_x;
 		uint32_t position_y;
 		uint32_t width;
@@ -95,9 +96,6 @@ public:
 	//! Accessor method to enable or disable the permanent or temporary status of the changes
 	void setPersistence(const Persistence setting) { mPersistence = setting; }
 	Persistence persistence() const { return mPersistence; }
-	
-	//! Takes the input data and executes the configuration change
-	bool applyLayoutChanges();
 	
     bool applyChanges(std::vector<Frame> &display_frames);
 
