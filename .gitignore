@@ -8,3 +8,5 @@
 
 /WindowServerConfig.xcodeproj/project.xcworkspace/xcuserdata/
 /build/
+
+*.xccheckout

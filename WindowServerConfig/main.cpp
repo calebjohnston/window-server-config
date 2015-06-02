@@ -147,6 +147,10 @@ int main(int argc, const char * argv[])
 				display_layout.setDesiredResolution(resolution.at(0), resolution.at(1));
 			}
             
+            // set display frequency
+            if (var_map.count("refresh")) {
+                display_layout.setDesiredFrequency(refresh_rate);
+            }
             
             // --display position and resolution with display ID
             std::vector<DisplayLayout::Frame> display_frames;
@@ -155,7 +159,9 @@ int main(int argc, const char * argv[])
                 std::vector<uint32_t> display_ids;
                 for(std::vector<int32_t>::iterator iter = display_data.begin(); iter != display_data.end(); ++iter) {
                     DisplayLayout::Frame* frame = new DisplayLayout::Frame();
-                    frame->displayID = *iter++;
+//					frame->displayID = *iter++;
+//					frame->serialNumber = *iter++;
+					frame->unitNumber = *iter++;
                     frame->position_x = *iter++;
                     frame->position_y = *iter++;
                     frame->width = *iter++;

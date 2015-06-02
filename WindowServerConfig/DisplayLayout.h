@@ -29,6 +29,8 @@ class DisplayLayout {
 public:
 	typedef struct frame_t {
         uint32_t displayID;
+        uint32_t serialNumber;
+		uint32_t unitNumber;
 		uint32_t position_x;
 		uint32_t position_y;
 		uint32_t width;
@@ -66,6 +68,10 @@ public:
 	uint32_t desiredResolutionWidth() const { return mResWidth; }
 	uint32_t desiredResolutionHeight() const { return mResHeight; }
 	
+    //! Accessor method for the desired frequency
+    void setDesiredFrequency(const uint32_t freq) { mFreq = freq; }
+    uint32_t desiredFrequency() const { return mFreq; }
+    
 	//! Accessor method for the desired number of columns in a display wall
 	void setDesiredColumns(const uint8_t width) { mColumns = width; }
 	uint8_t desiredColumns() const { return mColumns; }
@@ -91,16 +97,14 @@ public:
 	void setPersistence(const Persistence setting) { mPersistence = setting; }
 	Persistence persistence() const { return mPersistence; }
 	
-	//! Takes the input data and executes the configuration change
-	bool applyLayoutChanges();
-	
-    bool applyChanges(std::vector<DisplayLayout::Frame> &display_frames);
+    bool applyChanges(std::vector<Frame> &display_frames);
 
         
 private:
     
 	uint32_t mResWidth;
 	uint32_t mResHeight;
+    uint32_t mFreq;
 	uint8_t mColumns;
 	uint8_t mRows;
 	std::unordered_map<uint32_t, Frame> mDeviceFrames;
